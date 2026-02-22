@@ -1,0 +1,288 @@
+📚 PROJECT OVERVIEW PROMPT
+College De Sta. Teresa De Avila
+Learning Management System (LMS)
+(Inspired by Google Classroom System)
+________________________________________
+1️⃣ PROJECT SUMMARY
+Develop a Web-Based Learning Management System (LMS) for College De Sta. Teresa De Avila, inspired by the clean, modern, and minimal design of Google Classroom.
+The system will allow:
+•	Administrators to manage teachers, students, classes, and subjects
+•	Teachers to manage subjects, resources, tasks, and announcements
+•	Students to access tasks and announcements
+The system must follow a role-based access control structure with three roles:
+•	Admin
+•	Teacher
+•	Student
+________________________________________
+2️⃣ TECHNOLOGY STACK
+•	Backend Framework: PHP Laravel (Latest Version)
+•	Frontend: HTML5, CSS3, JavaScript
+•	Database: MySQL
+•	Authentication: Laravel Authentication System
+•	UI Structure: Responsive Admin Dashboard Layout
+________________________________________
+🎨 UI & LAYOUT STRUCTURE (ALL ROLES)
+Layout Structure:
+•	🔝 Top Navigation Bar
+•	📚 Sidebar (Role-Based)
+•	📄 Main Content Area
+________________________________________
+🔝 Top Navigation Bar (All Roles)
+Left Side:
+•	School Logo
+•	System Name:
+College De Sta. Teresa De Avila Learning Management System
+Right Side:
+•	🔔 Notification Bell
+•	👤 Profile Icon + Full Name + ID Number
+•	Dropdown Modal:
+o	Profile Settings
+o	Logout (with confirmation modal)
+________________________________________
+📌 Sidebar Navigation (Role-Based)
+Sidebar changes depending on user role.
+________________________________________
+🏫 LANDING PAGE (Public)
+Inspired by Google Classroom landing page design.
+Sections:
+1. Hero Section
+•	Large welcoming headline:
+“Empowering Digital Learning at College De Sta. Teresa De Avila”
+•	Short description about LMS benefits
+•	Buttons:
+o	Login
+o	Learn More
+________________________________________
+2. About the School
+•	Brief description of the college
+•	Mission & Vision
+•	Institutional highlights
+________________________________________
+3. Features Section
+•	Easy Class Management
+•	Online Assignments
+•	Performance Monitoring
+•	Announcements & Notifications
+________________________________________
+4. Footer
+•	School contact information
+•	Address
+•	Copyright
+________________________________________
+🔐 LOGIN PAGE
+Login Form Fields:
+•	ID Number
+•	Password
+•	Login Button
+Validation Rules:
+•	Required fields
+•	Incorrect credentials error message
+•	Disabled account error message
+Security:
+•	Laravel authentication
+•	Password hashing
+•	Login activity logging
+________________________________________
+👑 ADMIN PANEL
+Admin has full control over the system.
+________________________________________
+1️⃣ Teacher Management
+Features:
+•	Add Teacher Account (Modal Form)
+•	Bulk Import via CSV
+•	Search
+•	Filter
+•	Pagination
+Validation Fields:
+•	Full Name
+•	Contact Number
+•	ID Number
+•	Password
+•	Confirm Password
+Table Columns:
+•	Full Name
+•	Contact Number
+•	ID Number
+•	Status (Active/Inactive)
+•	Actions
+Action Buttons:
+•	Edit
+•	Activate / Deactivate
+•	Change Password
+•	Delete
+________________________________________
+2️⃣ Student Management
+Same structure as Teacher Management.
+Features:
+•	Add Student Account (Modal)
+•	Bulk Import CSV
+•	Search
+•	Filter
+•	Pagination
+Validation Fields:
+•	Full Name
+•	Contact Number
+•	ID Number
+•	Password
+•	Confirm Password
+Actions:
+•	Edit
+•	Activate / Deactivate
+•	Change Password
+•	Delete
+________________________________________
+3️⃣ Class Management
+Features:
+•	Add Class
+•	Assign Teacher
+•	Assign Students
+•	Bulk Import Classes (CSV)
+•	Search
+•	Filter
+•	Pagination
+Class Creation Fields:
+•	Class Name
+•	Assigned Teacher
+•	Assigned Students (Multi-select)
+Table Actions:
+•	View
+•	Edit
+•	Delete
+________________________________________
+4️⃣ Subject Management
+Features:
+•	Add Subject
+•	Assign to Class
+•	Subject Description
+•	Bulk Import (CSV)
+•	Search
+•	Filter
+•	Pagination
+Subject Fields:
+•	Subject Name
+•	Assigned Class
+•	Description
+Table Actions:
+•	View
+•	Edit
+•	Delete
+________________________________________
+5️⃣ Audit Logs
+Tracks:
+•	User logins
+•	Account creation
+•	Edits
+•	Deletions
+•	Password changes
+•	Activation / Deactivation
+Table Includes:
+•	User
+•	Role
+•	Action
+•	Timestamp
+•	IP Address
+Searchable and Paginated.
+________________________________________
+6️⃣ System Settings
+Admin can configure:
+•	School Name
+•	Logo Upload
+•	Academic Year
+•	System Maintenance Mode
+•	Password Policies
+________________________________________
+👨‍🏫 TEACHER PANEL
+Sidebar:
+•	Subjects Assigned
+•	Resources Management
+•	Task Management
+•	Performance Report
+•	Announcements
+________________________________________
+1️⃣ Subjects Assigned
+•	View assigned subjects
+•	View enrolled students
+________________________________________
+2️⃣ Resources Management
+•	Upload files (PDF, DOCX, PPT, etc.)
+•	Attach to subject
+•	Edit/Delete resources
+________________________________________
+3️⃣ Task Management
+•	Create Assignment
+•	Set Due Date
+•	Attach Files
+•	View Submissions
+•	Grade Students
+________________________________________
+4️⃣ Performance Report
+•	View student grades
+•	Export reports (optional PDF)
+________________________________________
+5️⃣ Announcement
+•	Post announcement
+•	Select target class
+•	Students receive notification
+________________________________________
+🎓 STUDENT PANEL
+Sidebar:
+•	Subjects Assigned
+•	Announcements
+•	Task Assigned
+________________________________________
+1️⃣ Announcement
+•	View announcements per class
+•	Notification support
+________________________________________
+2️⃣ Task Assigned
+•	View assigned tasks
+•	Submit assignments
+•	View grades and feedback
+________________________________________
+2️⃣ Subjects Assigned
+•	View assigned subjects
+•	View all resources in that subjects stream
+•	View grades and feedback
+•	
+________________________________________
+🔐 ROLE-BASED ACCESS CONTROL
+Feature	Admin	Teacher	Student
+Manage Teachers	✅	❌	❌
+Manage Students	✅	❌	❌
+Manage Classes	✅	❌	❌
+Manage Subjects	✅	❌	❌
+Upload Resources	❌	✅	❌
+Create Tasks	❌	✅	❌
+Submit Tasks	❌	❌	✅
+Announcements	✅	✅	View Only
+________________________________________
+📊 DATABASE STRUCTURE OVERVIEW
+Main Tables:
+•	users
+•	roles
+•	teachers
+•	students
+•	classes
+•	subjects
+•	class_student (pivot)
+•	subject_class (pivot)
+•	tasks
+•	submissions
+•	announcements
+•	resources
+•	audit_logs
+•	notifications
+•	system_settings
+________________________________________
+🚀 SYSTEM CHARACTERISTICS
+•	Responsive Design
+•	Clean UI (Google Classroom Inspired)
+•	Role-Based Dashboard
+•	Modal Forms for Create/Edit
+•	CSV Bulk Import Support
+•	Secure Authentication
+•	Activity Logging
+•	Pagination, Search & Filters
+
+
+OVERALL THIS IS JUST A GOOGLE CLASSROOM INSPIRED SYSTEM WITH SOME MODIFICATIONS FOR CUSTOMIZATION
