@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         :root {
-            --primary: #1a73e8;
+            --primary: #800020;
             --sidebar-w: 260px;
             --navbar-h: 64px;
             --bg: #f1f3f4;
@@ -143,19 +143,19 @@
     </a>
     <div class="sidebar-divider"></div>
     <div class="sidebar-section-label">Classroom</div>
-    <a href="#" class="sidebar-link">
+    <a href="{{ route('teacher.subjects.index') }}" class="sidebar-link {{ request()->routeIs('teacher.subjects.*') ? 'active' : '' }}">
         <span class="material-icons">menu_book</span>
         Subjects Assigned
     </a>
-    <a href="#" class="sidebar-link">
+    <a href="{{ route('teacher.resources.index') }}" class="sidebar-link {{ request()->routeIs('teacher.resources.*') ? 'active' : '' }}">
         <span class="material-icons">folder_open</span>
         Resources Management
     </a>
-    <a href="#" class="sidebar-link">
+    <a href="{{ route('teacher.tasks.index') }}" class="sidebar-link {{ request()->routeIs('teacher.tasks.*') || request()->routeIs('teacher.submissions.*') ? 'active' : '' }}">
         <span class="material-icons">assignment</span>
         Task Management
     </a>
-    <a href="#" class="sidebar-link">
+    <a href="{{ route('teacher.performance.index') }}" class="sidebar-link {{ request()->routeIs('teacher.performance.*') ? 'active' : '' }}">
         <span class="material-icons">bar_chart</span>
         Performance Report
     </a>
