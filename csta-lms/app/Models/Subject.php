@@ -12,4 +12,14 @@ class Subject extends Model
     {
         return $this->belongsTo(SchoolClass::class, 'class_id');
     }
+
+    public function resources()
+    {
+        return $this->hasMany(Resource::class);
+    }
+
+    public function tasks()
+    {
+        return $this->hasMany(Task::class);
+    }
 }
