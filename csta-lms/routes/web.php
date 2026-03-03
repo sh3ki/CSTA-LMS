@@ -12,6 +12,10 @@ use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Teacher\DashboardController as TeacherDashboard;
+use App\Http\Controllers\Teacher\SubjectController as TeacherSubjectController;
+use App\Http\Controllers\Teacher\ResourceController as TeacherResourceController;
+use App\Http\Controllers\Teacher\TaskController as TeacherTaskController;
+use App\Http\Controllers\Teacher\PerformanceController as TeacherPerformanceController;
 use App\Http\Controllers\Student\DashboardController as StudentDashboard;
 use Illuminate\Support\Facades\Route;
 
@@ -87,6 +91,30 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 // ─── Teacher Routes ────────────────────────────────────────────────────────────
 Route::prefix('teacher')->name('teacher.')->middleware(['auth', 'role:teacher'])->group(function () {
     Route::get('/dashboard', [TeacherDashboard::class, 'index'])->name('dashboard');
+
+    // Subjects Assigned
+    Route::get('/subjects',              [TeacherSubjectController::class, 'index'])->name('subjects.index');
+    Route::get('/subjects/{subject}',    [TeacherSubjectController::class, 'show'])->name('subjects.show');
+
+    // Resources Management
+    Route::get('/resources',              [TeacherResourceController::class, 'index'])->name('resources.index');
+    Route::post('/resources',             [TeacherResourceController::class, 'store'])->name('resources.store');
+    Route::put('/resources/{resource}',   [TeacherResourceController::class, 'update'])->name('resources.update');
+    Route::delete('/resources/{resource}',[TeacherResourceController::class, 'destroy'])->name('resources.destroy');
+    Route::get('/resources/{resource}/download', [TeacherResourceController::class, 'download'])->name('resources.download');
+
+    // Task Management
+    Route::get('/tasks',                  [TeacherTaskController::class, 'index'])->name('tasks.index');
+    Route::post('/tasks',                 [TeacherTaskController::class, 'store'])->name('tasks.store');
+    Route::get('/tasks/{task}',           [TeacherTaskController::class, 'show'])->name('tasks.show');
+    Route::put('/tasks/{task}',           [TeacherTaskController::class, 'update'])->name('tasks.update');
+    Route::delete('/tasks/{task}',        [TeacherTaskController::class, 'destroy'])->name('tasks.destroy');
+    Route::get('/tasks/{task}/download',  [TeacherTaskController::class, 'downloadAttachment'])->name('tasks.download');
+    Route::patch('/submissions/{submission}/grade', [TeacherTaskController::class, 'grade'])->name('submissions.grade');
+    Route::get('/submissions/{submission}/download', [TeacherTaskController::class, 'downloadSubmission'])->name('submissions.download');
+
+    // Performance Report
+    Route::get('/performance',            [TeacherPerformanceController::class, 'index'])->name('performance.index');
 });
 
 // ─── Student Routes ────────────────────────────────────────────────────────────
