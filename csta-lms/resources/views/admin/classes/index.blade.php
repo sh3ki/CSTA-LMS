@@ -80,7 +80,7 @@
                         <td>
                             @if($class->teacher)
                                 <div class="d-flex align-items-center gap-2">
-                                    <div class="avatar" style="width:28px;height:28px;background:linear-gradient(135deg,#1a73e8,#8ab4f8);font-size:11px;">
+                                    <div class="avatar" style="width:28px;height:28px;background:linear-gradient(135deg,#800020,#e8a0aa);font-size:11px;">
                                         {{ strtoupper(substr($class->teacher->full_name, 0, 2)) }}
                                     </div>
                                     <span style="font-size:13px;">{{ $class->teacher->full_name }}</span>
@@ -108,7 +108,7 @@
                                     data-name="{{ $class->name }}"
                                     data-teacher_id="{{ $class->teacher_id }}"
                                     data-students="{{ $class->students->pluck('id')->toJson() }}">
-                                    <span class="material-icons" style="color:#1a73e8;">edit</span>
+                                    <span class="material-icons" style="color:#800020;">edit</span>
                                 </button>
 
                                 {{-- Delete --}}
