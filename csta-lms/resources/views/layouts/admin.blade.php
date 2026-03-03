@@ -10,8 +10,8 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         :root {
-            --primary: #1a73e8;
-            --primary-dark: #1557b0;
+            --primary: #800020;
+            --primary-dark: #5c0016;
             --sidebar-w: 260px;
             --navbar-h: 64px;
             --bg: #f1f3f4;
@@ -19,8 +19,8 @@
             --text-muted: #5f6368;
             --border: #e8eaed;
             --sidebar-text: #3c4043;
-            --sidebar-active-bg: #e8f0fe;
-            --sidebar-active: #1a73e8;
+            --sidebar-active-bg: #fce8ec;
+            --sidebar-active: #800020;
         }
 
         * { font-family: 'Roboto', sans-serif; box-sizing: border-box; }
@@ -50,7 +50,7 @@
 
         .nav-brand-logo {
             width: 40px; height: 40px;
-            background: linear-gradient(135deg, #1a73e8, #34a853);
+            background: linear-gradient(135deg, #800020, #34a853);
             border-radius: 8px;
             display: flex; align-items: center; justify-content: center;
             flex-shrink: 0;
@@ -125,7 +125,7 @@
 
         .avatar {
             width: 36px; height: 36px;
-            background: linear-gradient(135deg, #1a73e8, #8ab4f8);
+            background: linear-gradient(135deg, #800020, #e8a0aa);
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             color: #fff;
@@ -354,12 +354,12 @@
 
         /* Buttons */
         .btn-primary {
-            background: #1a73e8;
-            border-color: #1a73e8;
+            background: #800020;
+            border-color: #800020;
             font-weight: 500;
         }
 
-        .btn-primary:hover { background: #1557b0; border-color: #1557b0; }
+        .btn-primary:hover { background: #5c0016; border-color: #5c0016; }
 
         .btn-icon {
             width: 32px; height: 32px;
@@ -425,15 +425,15 @@
         }
 
         .form-control:focus, .form-select:focus {
-            border-color: #1a73e8;
-            box-shadow: 0 0 0 3px rgba(26,115,232,.15);
+            border-color: #800020;
+            box-shadow: 0 0 0 3px rgba(128,0,32,.15);
         }
 
         .form-label { font-size: 13px; font-weight: 500; color: #3c4043; margin-bottom: 6px; }
 
         /* Pagination */
         .pagination .page-link {
-            color: #1a73e8;
+            color: #800020;
             border: 1px solid #e8eaed;
             border-radius: 8px !important;
             margin: 0 2px;
@@ -441,8 +441,8 @@
         }
 
         .pagination .page-item.active .page-link {
-            background: #1a73e8;
-            border-color: #1a73e8;
+            background: #800020;
+            border-color: #800020;
         }
 
         /* Toast */
