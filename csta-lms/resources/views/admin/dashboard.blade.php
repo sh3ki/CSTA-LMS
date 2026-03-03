@@ -18,8 +18,8 @@
 <div class="row g-4 mb-4">
     <div class="col-sm-6 col-xl-3">
         <div class="stat-card">
-            <div class="stat-icon" style="background:#e8f0fe;">
-                <span class="material-icons" style="color:#1a73e8;">person_outline</span>
+            <div class="stat-icon" style="background:#fce8ec;">
+                <span class="material-icons" style="color:#800020;">person_outline</span>
             </div>
             <div>
                 <div class="stat-value">{{ $stats['teachers'] }}</div>
@@ -71,9 +71,9 @@
     <div class="card-body p-4">
         <div class="row g-3">
             <div class="col-sm-6 col-lg-3">
-                <a href="{{ route('admin.teachers.index') }}" class="d-flex align-items-center gap-3 p-3 rounded-3 text-decoration-none" style="background:#f8f9fa;transition:all .2s;" onmouseover="this.style.background='#e8f0fe'" onmouseout="this.style.background='#f8f9fa'">
-                    <div style="width:44px;height:44px;background:#e8f0fe;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                        <span class="material-icons" style="color:#1a73e8;font-size:22px;">person_add</span>
+                <a href="{{ route('admin.teachers.index') }}" class="d-flex align-items-center gap-3 p-3 rounded-3 text-decoration-none" style="background:#f8f9fa;transition:all .2s;" onmouseover="this.style.background='#fce8ec'" onmouseout="this.style.background='#f8f9fa'">
+                    <div style="width:44px;height:44px;background:#fce8ec;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <span class="material-icons" style="color:#800020;font-size:22px;">person_add</span>
                     </div>
                     <div>
                         <div style="font-size:14px;font-weight:500;color:#202124;">Manage Teachers</div>
