@@ -12,7 +12,7 @@
 <div class="page-header">
     <div>
         <h1 class="page-title">
-            <span class="material-icons align-middle me-2" style="color:#1a73e8;">manage_accounts</span>
+            <span class="material-icons align-middle me-2" style="color:#800020;">manage_accounts</span>
             Profile Settings
         </h1>
         <p class="page-subtitle">Manage your account information and security.</p>
@@ -35,7 +35,7 @@
                          style="width:120px;height:120px;border-radius:50%;object-fit:cover;border:3px solid #e8eaed;">
                 @else
                     <div id="avatarInitials"
-                         style="width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#1a73e8,#34a853);display:flex;align-items:center;justify-content:center;font-family:'Google Sans',Roboto,sans-serif;font-size:42px;font-weight:600;color:#fff;border:3px solid #e8eaed;">
+                         style="width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#800020,#34a853);display:flex;align-items:center;justify-content:center;font-family:'Google Sans',Roboto,sans-serif;font-size:42px;font-weight:600;color:#fff;border:3px solid #e8eaed;">
                         {{ strtoupper(substr(auth()->user()->full_name, 0, 2)) }}
                     </div>
                     <img id="avatarPreview"
@@ -44,7 +44,7 @@
                          style="display:none;width:120px;height:120px;border-radius:50%;object-fit:cover;border:3px solid #e8eaed;">
                 @endif
                 <label for="profilePictureInput" title="Change photo"
-                       style="position:absolute;bottom:4px;right:4px;width:32px;height:32px;background:#1a73e8;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.25);">
+                       style="position:absolute;bottom:4px;right:4px;width:32px;height:32px;background:#800020;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.25);">
                     <span class="material-icons" style="font-size:16px;color:#fff;">photo_camera</span>
                 </label>
             </div>
@@ -65,7 +65,7 @@
                        style="display:none;" onchange="previewPhoto(this)">
 
                 <button type="submit" id="uploadBtn" class="btn btn-primary w-100 rounded-pill mb-2"
-                        style="background:#1a73e8;border-color:#1a73e8;display:none;">
+                        style="background:#800020;border-color:#800020;display:none;">
                     <span class="material-icons align-middle me-1" style="font-size:16px;">upload</span>
                     Upload Photo
                 </button>
@@ -102,7 +102,7 @@
         {{-- Personal Information --}}
         <div class="card p-4">
             <h6 style="font-family:'Google Sans',Roboto,sans-serif;font-weight:600;color:#202124;margin-bottom:20px;">
-                <span class="material-icons align-middle me-1" style="font-size:18px;color:#1a73e8;">person</span>
+                <span class="material-icons align-middle me-1" style="font-size:18px;color:#800020;">person</span>
                 Personal Information
             </h6>
             <form action="{{ route('profile.update') }}" method="POST">
@@ -139,7 +139,7 @@
                 </div>
                 <div class="d-flex justify-content-end mt-4">
                     <button type="submit" class="btn btn-primary rounded-pill px-4"
-                            style="background:#1a73e8;border-color:#1a73e8;">
+                            style="background:#800020;border-color:#800020;">
                         <span class="material-icons align-middle me-1" style="font-size:16px;">save</span>
                         Save Changes
                     </button>
