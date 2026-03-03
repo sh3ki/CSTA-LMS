@@ -5,7 +5,7 @@
 <div class="page-header">
     <div>
         <h1 class="page-title">
-            <span class="material-icons align-middle me-2" style="color:#1a73e8;">history</span>
+            <span class="material-icons align-middle me-2" style="color:#800020;">history</span>
             Audit Logs
         </h1>
         <p class="page-subtitle">Track all system activity and user actions.</p>
@@ -15,8 +15,8 @@
 @if($logs->isEmpty())
 <div class="card p-5 text-center">
     <div style="max-width:480px;margin:0 auto;">
-        <div style="width:80px;height:80px;background:#e8f0fe;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
-            <span class="material-icons" style="font-size:40px;color:#1a73e8;">history</span>
+        <div style="width:80px;height:80px;background:#fce8ec;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+            <span class="material-icons" style="font-size:40px;color:#800020;">history</span>
         </div>
         <h5 style="font-family:'Google Sans',Roboto,sans-serif;font-weight:600;color:#202124;margin-bottom:8px;">No Logs Yet</h5>
         <p style="font-size:14px;color:#5f6368;">System activity will be recorded here as users interact with the LMS.</p>
@@ -52,8 +52,8 @@
                     <td class="px-4 py-3">
                         @if($log->role)
                             <span class="badge rounded-pill px-3"
-                                style="background:{{ $log->role === 'admin' ? '#e8f0fe' : ($log->role === 'teacher' ? '#e6f4ea' : '#fef7e0') }};
-                                       color:{{ $log->role === 'admin' ? '#1a73e8' : ($log->role === 'teacher' ? '#34a853' : '#f9ab00') }};
+                                style="background:{{ $log->role === 'admin' ? '#fce8ec' : ($log->role === 'teacher' ? '#e6f4ea' : '#fef7e0') }};
+                                       color:{{ $log->role === 'admin' ? '#800020' : ($log->role === 'teacher' ? '#34a853' : '#f9ab00') }};
                                        font-size:11px;font-weight:500;">
                                 {{ ucfirst($log->role) }}
                             </span>
