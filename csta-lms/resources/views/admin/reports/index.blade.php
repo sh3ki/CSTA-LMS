@@ -5,7 +5,7 @@
 <div class="page-header">
     <div>
         <h1 class="page-title">
-            <span class="material-icons align-middle me-2" style="color:#1a73e8;">bar_chart</span>
+            <span class="material-icons align-middle me-2" style="color:#800020;">bar_chart</span>
             Reports &amp; Analytics
         </h1>
         <p class="page-subtitle">View system-wide reports and performance analytics.</p>
@@ -18,8 +18,8 @@
 
 <div class="card p-5 text-center">
     <div style="max-width:480px;margin:0 auto;">
-        <div style="width:80px;height:80px;background:#e8f0fe;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
-            <span class="material-icons" style="font-size:40px;color:#1a73e8;">bar_chart</span>
+        <div style="width:80px;height:80px;background:#fce8ec;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+            <span class="material-icons" style="font-size:40px;color:#800020;">bar_chart</span>
         </div>
         <h5 style="font-family:'Google Sans',Roboto,sans-serif;font-weight:600;color:#202124;margin-bottom:8px;">Reports &amp; Analytics</h5>
         <p style="font-size:14px;color:#5f6368;line-height:1.6;">
