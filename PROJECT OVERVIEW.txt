@@ -1,10 +1,10 @@
 📚 PROJECT OVERVIEW PROMPT
-College De Sta. Teresa De Avila
+Colegio De Sta. Teresa De Avila
 Learning Management System (LMS)
 (Inspired by Google Classroom System)
 ________________________________________
 1️⃣ PROJECT SUMMARY
-Develop a Web-Based Learning Management System (LMS) for College De Sta. Teresa De Avila, inspired by the clean, modern, and minimal design of Google Classroom.
+Develop a Web-Based Learning Management System (LMS) for Colegio De Sta. Teresa De Avila, inspired by the clean, modern, and minimal design of Google Classroom.
 The system will allow:
 •	Administrators to manage teachers, students, classes, and subjects
 •	Teachers to manage subjects, resources, tasks, and announcements
@@ -31,7 +31,7 @@ ________________________________________
 Left Side:
 •	School Logo
 •	System Name:
-College De Sta. Teresa De Avila Learning Management System
+Colegio De Sta. Teresa De Avila Learning Management System
 Right Side:
 •	🔔 Notification Bell
 •	👤 Profile Icon + Full Name + ID Number
@@ -47,7 +47,7 @@ Inspired by Google Classroom landing page design.
 Sections:
 1. Hero Section
 •	Large welcoming headline:
-“Empowering Digital Learning at College De Sta. Teresa De Avila”
+“Empowering Digital Learning at Colegio De Sta. Teresa De Avila”
 •	Short description about LMS benefits
 •	Buttons:
 o	Login
