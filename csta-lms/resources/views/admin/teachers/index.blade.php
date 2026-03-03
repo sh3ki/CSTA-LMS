@@ -59,7 +59,7 @@
             <span style="font-family:'Google Sans',Roboto,sans-serif;font-weight:600;font-size:15px;color:#202124;">
                 Teachers
             </span>
-            <span class="badge rounded-pill ms-1" style="background:#e8f0fe;color:#1a73e8;font-size:12px;">
+            <span class="badge rounded-pill ms-1" style="background:#fce8ec;color:#800020;font-size:12px;">
                 {{ $teachers->total() }}
             </span>
         </div>
@@ -82,7 +82,7 @@
                         <td style="color:#5f6368;width:48px;">{{ $teachers->firstItem() + $index }}</td>
                         <td>
                             <div class="d-flex align-items-center gap-2">
-                                <div class="avatar" style="width:36px;height:36px;background:linear-gradient(135deg,#1a73e8,#8ab4f8);font-size:13px;">
+                                <div class="avatar" style="width:36px;height:36px;background:linear-gradient(135deg,#800020,#e8a0aa);font-size:13px;">
                                     {{ strtoupper(substr($teacher->full_name, 0, 2)) }}
                                 </div>
                                 <span style="font-weight:500;">{{ $teacher->full_name }}</span>
@@ -108,7 +108,7 @@
                                     data-full_name="{{ $teacher->full_name }}"
                                     data-id_number="{{ $teacher->id_number }}"
                                     data-contact_number="{{ $teacher->contact_number }}">
-                                    <span class="material-icons" style="color:#1a73e8;">edit</span>
+                                    <span class="material-icons" style="color:#800020;">edit</span>
                                 </button>
 
                                 {{-- Activate/Deactivate --}}
@@ -180,8 +180,8 @@
         <div class="modal-content" style="border-radius:16px;border:none;box-shadow:0 8px 32px rgba(0,0,0,.15);">
             <div class="modal-header">
                 <div class="d-flex align-items-center gap-2">
-                    <div style="width:36px;height:36px;background:#e8f0fe;border-radius:10px;display:flex;align-items:center;justify-content:center;">
-                        <span class="material-icons" style="color:#1a73e8;font-size:20px;">person_add</span>
+                    <div style="width:36px;height:36px;background:#fce8ec;border-radius:10px;display:flex;align-items:center;justify-content:center;">
+                        <span class="material-icons" style="color:#800020;font-size:20px;">person_add</span>
                     </div>
                     <h5 class="modal-title">Add Teacher</h5>
                 </div>
@@ -244,8 +244,8 @@
         <div class="modal-content" style="border-radius:16px;border:none;box-shadow:0 8px 32px rgba(0,0,0,.15);">
             <div class="modal-header">
                 <div class="d-flex align-items-center gap-2">
-                    <div style="width:36px;height:36px;background:#e8f0fe;border-radius:10px;display:flex;align-items:center;justify-content:center;">
-                        <span class="material-icons" style="color:#1a73e8;font-size:20px;">edit</span>
+                    <div style="width:36px;height:36px;background:#fce8ec;border-radius:10px;display:flex;align-items:center;justify-content:center;">
+                        <span class="material-icons" style="color:#800020;font-size:20px;">edit</span>
                     </div>
                     <h5 class="modal-title">Edit Teacher</h5>
                 </div>
