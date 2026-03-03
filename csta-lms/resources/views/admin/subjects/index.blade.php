@@ -104,7 +104,7 @@
                                     data-name="{{ $subject->name }}"
                                     data-class_id="{{ $subject->class_id }}"
                                     data-description="{{ $subject->description }}">
-                                    <span class="material-icons" style="color:#1a73e8;">edit</span>
+                                    <span class="material-icons" style="color:#800020;">edit</span>
                                 </button>
 
                                 <button class="btn-icon" title="Delete"
