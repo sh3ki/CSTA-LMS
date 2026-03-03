@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         :root {
-            --primary: #1a73e8;
+            --primary: #800020;
             --sidebar-w: 260px;
             --navbar-h: 64px;
             --bg: #f1f3f4;
