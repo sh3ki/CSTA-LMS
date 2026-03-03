@@ -101,7 +101,7 @@
                                     data-full_name="{{ $student->full_name }}"
                                     data-id_number="{{ $student->id_number }}"
                                     data-contact_number="{{ $student->contact_number }}">
-                                    <span class="material-icons" style="color:#1a73e8;">edit</span>
+                                    <span class="material-icons" style="color:#800020;">edit</span>
                                 </button>
 
                                 <form action="{{ route('admin.students.toggleStatus', $student) }}" method="POST" class="d-inline">
