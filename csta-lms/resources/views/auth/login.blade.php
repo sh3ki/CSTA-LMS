@@ -20,7 +20,7 @@
         /* ── LEFT PANEL ── */
         .login-left {
             flex: 1;
-            background: linear-gradient(145deg, #1a73e8 0%, #0d47a1 60%, #083378 100%);
+            background: linear-gradient(145deg, #800020 0%, #3d000e 60%, #2a000a 100%);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -215,8 +215,8 @@
             background: #fff;
         }
         .form-control:focus {
-            border-color: #1a73e8;
-            box-shadow: 0 0 0 3px rgba(26,115,232,.15);
+            border-color: #800020;
+            box-shadow: 0 0 0 3px rgba(128,0,32,.15);
             outline: none;
         }
         .form-control.is-invalid { border-color: #ea4335; }
@@ -239,7 +239,7 @@
         }
         .btn-pw-toggle:hover { background: #f1f3f4; }
         .btn-login {
-            background: linear-gradient(135deg, #1a73e8, #1557b0);
+            background: linear-gradient(135deg, #800020, #5c0016);
             color: #fff;
             border: none;
             border-radius: 10px;
@@ -254,12 +254,12 @@
             box-shadow: 0 2px 8px rgba(26,115,232,.35);
         }
         .btn-login:hover {
-            background: linear-gradient(135deg, #1557b0, #0d47a1);
+            background: linear-gradient(135deg, #5c0016, #3d000e);
             box-shadow: 0 4px 16px rgba(26,115,232,.45);
             transform: translateY(-1px);
         }
         .btn-login:active { transform: scale(.98); box-shadow: none; }
-        .form-check-input:checked { background-color: #1a73e8; border-color: #1a73e8; }
+        .form-check-input:checked { background-color: #800020; border-color: #800020; }
         .alert-danger {
             background: #fce8e6;
             border: none;
@@ -288,7 +288,7 @@
             text-decoration: none;
             transition: color .15s;
         }
-        .back-link:hover { color: #1a73e8; }
+        .back-link:hover { color: #800020; }
         .right-footer {
             position: absolute;
             bottom: 16px;
@@ -323,7 +323,7 @@
             <img src="{{ asset('logo.jpg') }}" alt="CSTA Logo">
             <div class="left-brand-text">
                 <div class="app-name">CSTA-LMS</div>
-                <div class="school-name">College De Sta. Teresa De Avila</div>
+                <div class="school-name">Colegio De Sta. Teresa De Avila</div>
             </div>
         </div>
 
@@ -361,7 +361,7 @@
         </div>
 
         <div class="left-footer">
-            &copy; {{ date('Y') }} College De Sta. Teresa De Avila. All rights reserved.
+            &copy; {{ date('Y') }} Colegio De Sta. Teresa De Avila. All rights reserved.
         </div>
     </div>
 
