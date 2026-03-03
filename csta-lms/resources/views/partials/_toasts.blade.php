@@ -92,14 +92,14 @@
 .csta-toast-success { border-left-color:#34a853; }
 .csta-toast-error   { border-left-color:#ea4335; }
 .csta-toast-warning { border-left-color:#f9ab00; }
-.csta-toast-info    { border-left-color:#1a73e8; }
+.csta-toast-info    { border-left-color:#800020; }
 
 .csta-toast-icon { flex-shrink:0; display:flex; align-items:center; }
 .csta-toast-icon .material-icons { font-size:20px; }
 .csta-toast-success .csta-toast-icon .material-icons { color:#34a853; }
 .csta-toast-error   .csta-toast-icon .material-icons { color:#ea4335; }
 .csta-toast-warning .csta-toast-icon .material-icons { color:#f9ab00; }
-.csta-toast-info    .csta-toast-icon .material-icons { color:#1a73e8; }
+.csta-toast-info    .csta-toast-icon .material-icons { color:#800020; }
 
 .csta-toast-body {
     flex:1;
@@ -132,7 +132,7 @@
 .csta-toast-success .csta-toast-progress { background:#34a853; }
 .csta-toast-error   .csta-toast-progress { background:#ea4335; }
 .csta-toast-warning .csta-toast-progress { background:#f9ab00; }
-.csta-toast-info    .csta-toast-progress { background:#1a73e8; }
+.csta-toast-info    .csta-toast-progress { background:#800020; }
 
 @keyframes toastProgress {
     from { width:100%; }
