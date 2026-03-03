@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSTA-LMS &mdash; College De Sta. Teresa De Avila</title>
+    <title>CSTA-LMS &mdash; Colegio De Sta. Teresa De Avila</title>
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         :root {
-            --primary: #1a73e8;
-            --primary-dark: #1557b0;
+            --primary: #800020;
+            --primary-dark: #5c0016;
             --accent: #34a853;
             --danger: #ea4335;
             --warning: #fbbc04;
@@ -61,7 +61,7 @@
 
         /* Hero */
         .hero {
-            background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+            background: linear-gradient(135deg, #800020 0%, #3d000e 100%);
             color: #fff;
             padding: 100px 0 80px;
             position: relative;
@@ -107,7 +107,7 @@
 
         .btn-hero-primary {
             background: #fff;
-            color: #1a73e8;
+            color: #800020;
             border: none;
             padding: 14px 32px;
             border-radius: 24px;
@@ -119,8 +119,8 @@
         }
 
         .btn-hero-primary:hover {
-            background: #e8f0fe;
-            color: #1557b0;
+            background: #fce8ec;
+            color: #5c0016;
             transform: translateY(-1px);
         }
 
@@ -151,8 +151,8 @@
 
         .section-label {
             display: inline-block;
-            background: #e8f0fe;
-            color: #1a73e8;
+            background: #fce8ec;
+            color: #800020;
             font-size: 12px;
             font-weight: 600;
             letter-spacing: 1.5px;
@@ -188,7 +188,7 @@
         .feature-card:hover {
             box-shadow: 0 8px 24px rgba(0,0,0,.1);
             transform: translateY(-4px);
-            border-color: #d2e3fc;
+            border-color: #f5b0ba;
         }
 
         .feature-icon {
@@ -222,7 +222,7 @@
 
         /* Mission Vision */
         .mv-card {
-            background: linear-gradient(135deg, #e8f0fe 0%, #f1f8e9 100%);
+            background: linear-gradient(135deg, #fce8ec 0%, #f1f8e9 100%);
             border-radius: 16px;
             padding: 36px;
         }
@@ -266,7 +266,7 @@
             right: 28px;
             width: 44px;
             height: 44px;
-            background: #1a73e8;
+            background: #800020;
             color: #fff;
             border-radius: 50%;
             display: flex;
@@ -280,7 +280,7 @@
         }
 
         .scroll-to-top:hover {
-            background: #1557b0;
+            background: #5c0016;
             color: #fff;
             transform: translateY(-2px);
         }
@@ -294,10 +294,10 @@
         <img src="{{ asset('logo.jpg') }}" alt="CSTA-LMS Logo" style="height:44px;width:auto;object-fit:contain;">
         <div>
             <div class="brand-text">CSTA Learning Management System</div>
-            <div class="brand-sub">College De Sta. Teresa De Avila</div>
+            <div class="brand-sub">Colegio De Sta. Teresa De Avila</div>
         </div>
     </a>
-    <a href="{{ route('login') }}" class="btn btn-primary rounded-pill px-4" style="background:#1a73e8;border:none;font-weight:500;">
+    <a href="{{ route('login') }}" class="btn btn-primary rounded-pill px-4" style="background:#800020;border:none;font-weight:500;">
         Sign In
     </a>
 </nav>
@@ -307,7 +307,7 @@
     <div class="container position-relative" style="z-index:1;">
         <div class="row align-items-center">
             <div class="col-lg-7">
-                <h1>Empowering Digital Learning at<br>College De Sta. Teresa De Avila</h1>
+                <h1>Empowering Digital Learning at<br>Colegio De Sta. Teresa De Avila</h1>
                 <p>A modern, streamlined Learning Management System designed to connect teachers, students, and administrators — making education more accessible and organized.</p>
                 <div class="d-flex gap-3 flex-wrap">
                     <a href="{{ route('login') }}" class="btn-hero-primary">
@@ -318,10 +318,8 @@
                 </div>
             </div>
             <div class="col-lg-5 d-none d-lg-flex justify-content-center mt-4 mt-lg-0">
-                <div style="width:340px;height:280px;background:rgba(255,255,255,.12);border-radius:20px;backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;padding:28px;">
-                    <span class="material-icons" style="font-size:72px;color:rgba(255,255,255,.9);">menu_book</span>
-                    <div style="font-family:'Google Sans',Roboto,sans-serif;font-size:18px;font-weight:600;color:rgba(255,255,255,.95);">CSTA-LMS</div>
-                    <div style="font-size:13px;color:rgba(255,255,255,.75);text-align:center;">Manage. Learn. Grow.</div>
+                <div style="border-radius:20px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.3);border:3px solid rgba(255,255,255,.25);width:100%;">
+                    <img src="{{ asset('storage/CSTA.jpg') }}" alt="Colegio De Sta. Teresa De Avila" style="width:100%;height:320px;display:block;object-fit:cover;">
                 </div>
             </div>
         </div>
@@ -334,36 +332,41 @@
         <div class="row g-5 align-items-center">
             <div class="col-lg-6">
                 <span class="section-label">About the School</span>
-                <h2 class="section-title">College De Sta. Teresa De Avila</h2>
+                <h2 class="section-title">Colegio De Sta. Teresa De Avila</h2>
                 <p class="text-secondary lh-lg">
-                    College De Sta. Teresa De Avila is a premier Catholic educational institution committed to excellence in academics, character formation, and holistic development. Rooted in the Teresian tradition, the college provides quality education that integrates faith, service, and leadership.
-                </p>
-                <p class="text-secondary lh-lg">
-                    Our Learning Management System brings our time-honored academic traditions into the digital age — enabling seamless communication, resource sharing, and performance tracking for our entire academic community.
+                    Colegio de Sta. Teresa de Avila (CSTA), established in 2007 in Novaliches, Quezon City, is a private institution offering quality education with a focus on holistic growth. It is known for its ladderized education programs, particularly in Hospitality Management (BSHM) with embedded TESDA NC II certifications, alongside courses in IT, Tourism, and Education.
                 </p>
             </div>
             <div class="col-lg-6">
                 <div class="row g-4">
                     <div class="col-12">
-                        <div class="mv-card">
-                            <h5 class="fw-semibold mb-2" style="color:#1a73e8;">
-                                <span class="material-icons align-middle me-1" style="font-size:20px;">visibility</span>
-                                Vision
-                            </h5>
-                            <p class="text-secondary mb-0 lh-lg" style="font-size:14px;">
-                                To be a leading institution in Catholic higher education, forming competent, committed, and compassionate graduates who will become agents of transformation in society.
-                            </p>
+                        <div class="mv-card overflow-hidden p-0" style="border-radius:16px;">
+                            <img src="{{ asset('storage/vision.jpg') }}" alt="CSTA Campus"
+                                 style="width:100%;height:160px;object-fit:cover;display:block;">
+                            <div style="padding:20px 24px;background:linear-gradient(135deg,#fce8ec 0%,#fff5f7 100%);">
+                                <h5 class="fw-semibold mb-2" style="color:#800020;">
+                                    <span class="material-icons align-middle me-1" style="font-size:20px;">visibility</span>
+                                    Vision
+                                </h5>
+                                <p class="text-secondary mb-0 lh-lg" style="font-size:14px;">
+                                    A recognized leader in providing multi-disciplinary inclusive quality education that uplifts society in a collaborative global environment.
+                                </p>
+                            </div>
                         </div>
                     </div>
                     <div class="col-12">
-                        <div class="mv-card" style="background:linear-gradient(135deg,#e8f5e9 0%,#e3f2fd 100%);">
-                            <h5 class="fw-semibold mb-2" style="color:#34a853;">
-                                <span class="material-icons align-middle me-1" style="font-size:20px;">rocket_launch</span>
-                                Mission
-                            </h5>
-                            <p class="text-secondary mb-0 lh-lg" style="font-size:14px;">
-                                To provide quality and holistic education anchored on Christian values, guided by the spirit of St. Teresa of Avila, and responsive to the needs of the times.
-                            </p>
+                        <div class="mv-card overflow-hidden p-0" style="border-radius:16px;">
+                            <img src="{{ asset('storage/mission.jpg') }}" alt="CSTA Mission"
+                                 style="width:100%;height:160px;object-fit:cover;display:block;object-position:bottom;">
+                            <div style="padding:20px 24px;background:linear-gradient(135deg,#fce8ec 0%,#fff5f7 100%);">
+                                <h5 class="fw-semibold mb-2" style="color:#800020;">
+                                    <span class="material-icons align-middle me-1" style="font-size:20px;">rocket_launch</span>
+                                    Mission
+                                </h5>
+                                <p class="text-secondary mb-0 lh-lg" style="font-size:14px;">
+                                    Develop diverse learner for global citizenship and leadership by sustaining holistic academic excellence for the maximum fulfillment of human potential amidst the ever-evolving society.
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -384,8 +387,8 @@
         <div class="row g-4 mt-2">
             <div class="col-md-6 col-lg-3">
                 <div class="feature-card">
-                    <div class="feature-icon" style="background:#e8f0fe;">
-                        <span class="material-icons" style="color:#1a73e8;">class</span>
+                    <div class="feature-icon" style="background:#fce8ec;">
+                        <span class="material-icons" style="color:#800020;">class</span>
                     </div>
                     <h5>Easy Class Management</h5>
                     <p>Organize classes, assign teachers and students, and keep everything structured and accessible.</p>
@@ -428,8 +431,8 @@
         <div class="row g-4">
             <div class="col-md-5">
                 <div class="d-flex align-items-center gap-2 mb-3">
-                    <div style="width:36px;height:36px;background:linear-gradient(135deg,#1a73e8,#34a853);border-radius:8px;display:flex;align-items:center;justify-content:center;">
-                        <span class="material-icons" style="color:#fff;font-size:20px;"><img src="{{ asset('logo.jpg') }}" alt="CSTA-LMS Logo" style="height:40px;width:auto;object-fit:contain;border-radius:6px;"></span>
+                    <div style="width:40px;height:40px;border-radius:8px;overflow:hidden;flex-shrink:0;">
+                        <img src="{{ asset('logo.jpg') }}" alt="CSTA-LMS Logo" style="width:100%;height:100%;object-fit:contain;border-radius:6px;">
                     </div>
                     <div>
                         <div style="font-family:'Google Sans',Roboto,sans-serif;font-weight:600;color:#fff;font-size:14px;">CSTA-LMS</div>
@@ -437,7 +440,7 @@
                     </div>
                 </div>
                 <p style="font-size:13px;line-height:1.7;">
-                    College De Sta. Teresa De Avila Learning Management System — empowering students, teachers, and administrators through digital education.
+                    Colegio De Sta. Teresa De Avila Learning Management System — empowering students, teachers, and administrators through digital education.
                 </p>
             </div>
             <div class="col-md-3 offset-md-1">
@@ -451,17 +454,18 @@
                 <h6>Contact Us</h6>
                 <p style="font-size:13px;line-height:1.8;margin:0;">
                     <span class="material-icons align-middle me-1" style="font-size:15px;">location_on</span>
-                    College De Sta. Teresa De Avila<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;Philippines<br>
+                    6 Kingfisher corner Skylark Street,<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;Zabarte Subdivision, Brgy. Kaligayahan,<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;Novaliches, Quezon City, Philippines<br>
                     <span class="material-icons align-middle me-1" style="font-size:15px;">phone</span>
-                    (000) 000-0000<br>
+                    +63 282753916<br>
                     <span class="material-icons align-middle me-1" style="font-size:15px;">email</span>
-                    info@csta.edu.ph
+                    officialcstaregistrar@gmail.com
                 </p>
             </div>
         </div>
         <div class="footer-bottom">
-            &copy; {{ date('Y') }} College De Sta. Teresa De Avila. All rights reserved.
+            &copy; {{ date('Y') }} Colegio De Sta. Teresa De Avila. All rights reserved.
         </div>
     </div>
 </footer>
