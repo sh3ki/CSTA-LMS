@@ -7,6 +7,7 @@ use App\Models\AuditLog;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class StudentController extends Controller
 {
@@ -19,6 +20,7 @@ class StudentController extends Controller
             $query->where(function ($qq) use ($q) {
                 $qq->where('full_name', 'like', "%$q%")
                    ->orWhere('id_number', 'like', "%$q%")
+                   ->orWhere('email', 'like', "%$q%")
                    ->orWhere('contact_number', 'like', "%$q%");
             });
         }
@@ -36,15 +38,28 @@ class StudentController extends Controller
     {
         $request->validate([
             'full_name'      => 'required|string|max:255',
+            'email'          => 'required|email|max:255|unique:users,email',
             'contact_number' => 'nullable|string|max:20',
             'id_number'      => 'required|string|max:50|unique:users,id_number',
+            'course'         => 'nullable|string|max:255',
+            'year_level'     => 'nullable|string|max:50',
             'password'       => 'required|string|min:6|confirmed',
+            'profile_picture'=> 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
         ]);
+
+        $photoPath = null;
+        if ($request->hasFile('profile_picture')) {
+            $photoPath = $request->file('profile_picture')->store('profile-pictures', 'public');
+        }
 
         $student = User::create([
             'full_name'      => $request->full_name,
+            'email'          => $request->email,
             'contact_number' => $request->contact_number,
             'id_number'      => $request->id_number,
+            'course'         => $request->course,
+            'year_level'     => $request->year_level,
+            'profile_picture'=> $photoPath,
             'password'       => Hash::make($request->password),
             'role'           => 'student',
             'status'         => true,
@@ -59,15 +74,31 @@ class StudentController extends Controller
     {
         $request->validate([
             'full_name'      => 'required|string|max:255',
+            'email'          => 'required|email|max:255|unique:users,email,' . $student->id,
             'contact_number' => 'nullable|string|max:20',
             'id_number'      => 'required|string|max:50|unique:users,id_number,' . $student->id,
+            'course'         => 'nullable|string|max:255',
+            'year_level'     => 'nullable|string|max:50',
+            'profile_picture'=> 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
         ]);
 
-        $student->update([
+        $data = [
             'full_name'      => $request->full_name,
+            'email'          => $request->email,
             'contact_number' => $request->contact_number,
             'id_number'      => $request->id_number,
-        ]);
+            'course'         => $request->course,
+            'year_level'     => $request->year_level,
+        ];
+
+        if ($request->hasFile('profile_picture')) {
+            if ($student->profile_picture) {
+                Storage::disk('public')->delete($student->profile_picture);
+            }
+            $data['profile_picture'] = $request->file('profile_picture')->store('profile-pictures', 'public');
+        }
+
+        $student->update($data);
 
         AuditLog::record('Edit Student', "Updated student account: {$student->full_name} ({$student->id_number})");
 
@@ -139,8 +170,11 @@ class StudentController extends Controller
 
             User::create([
                 'id_number'      => trim($record['id_number']),
+                'email'          => trim($record['email'] ?? '') ?: null,
                 'full_name'      => trim($record['full_name']),
                 'contact_number' => trim($record['contact_number'] ?? ''),
+                'course'         => trim($record['course'] ?? '') ?: null,
+                'year_level'     => trim($record['year_level'] ?? '') ?: null,
                 'password'       => Hash::make(trim($record['password'])),
                 'role'           => 'student',
                 'status'         => true,
