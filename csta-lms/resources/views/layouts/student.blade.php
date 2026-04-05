@@ -64,6 +64,29 @@
         .alert-success.alert-slim { background:#e6f4ea;border:none;color:#137333; }
         .alert-danger.alert-slim { background:#fce8e6;border:none;color:#c5221f; }
 
+        /* Pagination */
+        .pagination { margin: 0; gap: 2px; }
+        .pagination .page-link {
+            border-radius: 8px;
+            border: 1px solid #dadce0;
+            color: #5f6368;
+            font-size: 13px;
+            min-width: 36px;
+            text-align: center;
+            padding: 6px 10px;
+        }
+        .pagination .page-item.active .page-link {
+            background: #fef7e0;
+            border-color: #fde293;
+            color: #b06000;
+            font-weight: 600;
+        }
+        .pagination .page-item.disabled .page-link {
+            color: #9aa0a6;
+            background: #f8f9fa;
+        }
+        .pagination svg { width: 14px; height: 14px; }
+
         .sidebar-overlay { display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:899; }
 
         @media (max-width: 992px) {
@@ -141,17 +164,17 @@
         <span class="material-icons">dashboard</span>
         Dashboard
     </a>
-    <div class="sidebar-divider"></div>
-    <div class="sidebar-section-label">Learning</div>
-    <a href="#" class="sidebar-link">
-        <span class="material-icons">menu_book</span>
-        Subjects
-    </a>
-    <a href="#" class="sidebar-link">
+    <a href="{{ route('student.announcements.index') }}" class="sidebar-link {{ request()->routeIs('student.announcements.*') ? 'active' : '' }}">
         <span class="material-icons">campaign</span>
         Announcements
     </a>
-    <a href="#" class="sidebar-link">
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section-label">Learning</div>
+    <a href="{{ route('student.subjects.index') }}" class="sidebar-link {{ request()->routeIs('student.subjects.*') ? 'active' : '' }}">
+        <span class="material-icons">menu_book</span>
+        Subjects
+    </a>
+    <a href="{{ route('student.tasks.index') }}" class="sidebar-link {{ request()->routeIs('student.tasks.*') ? 'active' : '' }}">
         <span class="material-icons">assignment_turned_in</span>
         Tasks &amp; Activities
     </a>
