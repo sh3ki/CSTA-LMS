@@ -25,6 +25,7 @@ class UserFactory extends Factory
     {
         return [
             'id_number'      => fake()->unique()->numerify('STU-######'),
+            'email'          => fake()->unique()->safeEmail(),
             'full_name'      => fake()->name(),
             'contact_number' => fake()->phoneNumber(),
             'role'           => 'student',
@@ -38,6 +39,7 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'id_number' => fake()->unique()->numerify('TCH-######'),
+            'email'     => fake()->unique()->safeEmail(),
             'role'      => 'teacher',
         ]);
     }
@@ -46,6 +48,7 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'id_number' => fake()->unique()->numerify('ADM-######'),
+            'email'     => fake()->unique()->safeEmail(),
             'role'      => 'admin',
         ]);
     }
