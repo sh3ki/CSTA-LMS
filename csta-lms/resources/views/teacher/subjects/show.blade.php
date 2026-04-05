@@ -41,6 +41,14 @@
     @if($subject->description)
         <div style="font-size:13px;color:rgba(255,255,255,.75);max-width:60%;">{{ $subject->description }}</div>
     @endif
+    @if($subject->subject_code)
+        <div class="d-flex align-items-center gap-2 mt-2">
+            <span id="teacherSubjectCode" style="background:rgba(255,255,255,.2);border-radius:20px;padding:4px 14px;font-size:13px;color:#fff;">Code: {{ $subject->subject_code }}</span>
+            <button type="button" class="btn btn-sm" id="copyTeacherSubjectCodeBtn" style="background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);color:#fff;">
+                <span class="material-icons align-middle" style="font-size:16px;">content_copy</span>
+            </button>
+        </div>
+    @endif
     <div class="d-flex gap-3 mt-3">
         <span style="background:rgba(255,255,255,.2);border-radius:20px;padding:4px 14px;font-size:13px;color:#fff;">
             <span class="material-icons align-middle me-1" style="font-size:14px;">groups</span> {{ $students->count() }} Students
@@ -96,7 +104,7 @@
                             <div class="flex-grow-1">
                                 <div class="d-flex align-items-center justify-content-between">
                                     <div>
-                                        <span style="font-weight:600;font-size:14px;color:#202124;">{{ auth()->user()->full_name }}</span>
+                                        <span style="font-weight:600;font-size:14px;color:#202124;">{{ $r->uploader?->full_name ?? 'Unknown User' }}</span>
                                         <span style="font-size:13px;color:#5f6368;"> posted a new resource</span>
                                     </div>
                                     <div class="dropdown">
@@ -162,7 +170,7 @@
                             <div class="flex-grow-1">
                                 <div class="d-flex align-items-center justify-content-between">
                                     <div>
-                                        <span style="font-weight:600;font-size:14px;color:#202124;">{{ auth()->user()->full_name }}</span>
+                                        <span style="font-weight:600;font-size:14px;color:#202124;">{{ $t->creator?->full_name ?? ($subject->schoolClass?->teacher?->full_name ?? 'Unknown User') }}</span>
                                         <span style="font-size:13px;color:#5f6368;"> posted a new assignment:
                                             <strong style="color:#202124;">{{ $t->title }}</strong>
                                         </span>
@@ -297,6 +305,14 @@
                         <input type="text" name="title" class="form-control" placeholder="e.g. Chapter 1 Notes" required>
                     </div>
                     <div class="mb-3">
+                        <label class="form-label fw-semibold" style="font-size:13px;">Resource Type <span class="text-danger">*</span></label>
+                        <select name="resource_type" class="form-select" required>
+                            <option value="Course Syllabus">Course Syllabus</option>
+                            <option value="Lesson">Lesson</option>
+                            <option value="Others" selected>Others</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
                         <label class="form-label fw-semibold" style="font-size:13px;">Description</label>
                         <textarea name="description" class="form-control" rows="3" placeholder="Brief description of this resource..."></textarea>
                     </div>
@@ -338,6 +354,15 @@
                         <div class="col-12">
                             <label class="form-label fw-semibold" style="font-size:13px;">Title <span class="text-danger">*</span></label>
                             <input type="text" name="title" class="form-control" placeholder="e.g. Essay on Philippine History" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" style="font-size:13px;">Task Type <span class="text-danger">*</span></label>
+                            <select name="task_type" class="form-select" required>
+                                <option value="Activity">Activity</option>
+                                <option value="Quiz">Quiz</option>
+                                <option value="Assignment" selected>Assignment</option>
+                                <option value="Others">Others</option>
+                            </select>
                         </div>
                         <div class="col-12">
                             <label class="form-label fw-semibold" style="font-size:13px;">Instructions</label>
@@ -386,4 +411,31 @@
     .stream-card { border:1px solid #e8eaed;border-radius:10px;transition:box-shadow .2s; }
     .stream-card:hover { box-shadow:0 2px 8px rgba(0,0,0,.08); }
 </style>
+@endpush
+
+@push('scripts')
+<script>
+(() => {
+    const btn = document.getElementById('copyTeacherSubjectCodeBtn');
+    if (!btn) return;
+
+    btn.addEventListener('click', async () => {
+        const codeText = document.getElementById('teacherSubjectCode')?.textContent?.replace('Code:', '').trim();
+        if (!codeText) return;
+
+        try {
+            await navigator.clipboard.writeText(codeText);
+        } catch (e) {
+            const input = document.createElement('input');
+            input.value = codeText;
+            document.body.appendChild(input);
+            input.select();
+            document.execCommand('copy');
+            document.body.removeChild(input);
+        }
+
+        btn.innerHTML = '<span class="material-icons align-middle" style="font-size:16px;">check</span>';
+    });
+})();
+</script>
 @endpush
