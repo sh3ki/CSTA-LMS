@@ -79,7 +79,7 @@
         <div style="font-size:13px;color:#5f6368;">
             Showing {{ $logs->firstItem() }}–{{ $logs->lastItem() }} of {{ $logs->total() }} entries
         </div>
-        {{ $logs->links() }}
+        {{ $logs->links('pagination::bootstrap-5') }}
     </div>
     @endif
 </div>
