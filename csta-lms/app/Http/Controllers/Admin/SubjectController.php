@@ -26,6 +26,10 @@ class SubjectController extends Controller
             $query->where('class_id', $request->class_id);
         }
 
+        if ($request->filled('status') && $request->status !== '') {
+            $query->where('status', (bool) $request->status);
+        }
+
         $subjects = $query->orderBy('name')->paginate(10)->withQueryString();
         $classes  = SchoolClass::orderBy('name')->get();
 
@@ -37,13 +41,21 @@ class SubjectController extends Controller
         $request->validate([
             'name'        => 'required|string|max:255',
             'class_id'    => 'nullable|exists:classes,id',
+            'course_code' => 'nullable|string|max:100',
+            'semester'    => 'nullable|in:1st,2nd,3rd',
             'description' => 'nullable|string',
+            'status'      => 'nullable|boolean',
         ]);
 
         $subject = Subject::create([
             'name'        => $request->name,
+            'subject_code'=> Subject::generateUniqueCode(),
+            'course_code' => $request->course_code,
+            'semester'    => $request->semester,
             'class_id'    => $request->class_id,
             'description' => $request->description,
+            'status'      => $request->boolean('status', true),
+            'created_by'  => $request->user()->id,
         ]);
 
         AuditLog::record('Create Subject', "Created subject: {$subject->name}");
@@ -62,13 +74,19 @@ class SubjectController extends Controller
         $request->validate([
             'name'        => 'required|string|max:255',
             'class_id'    => 'nullable|exists:classes,id',
+            'course_code' => 'nullable|string|max:100',
+            'semester'    => 'nullable|in:1st,2nd,3rd',
             'description' => 'nullable|string',
+            'status'      => 'nullable|boolean',
         ]);
 
         $subject->update([
             'name'        => $request->name,
+            'course_code' => $request->course_code,
+            'semester'    => $request->semester,
             'class_id'    => $request->class_id,
             'description' => $request->description,
+            'status'      => $request->boolean('status', true),
         ]);
 
         AuditLog::record('Edit Subject', "Updated subject: {$subject->name}");
@@ -120,8 +138,13 @@ class SubjectController extends Controller
 
             Subject::create([
                 'name'        => trim($record['name']),
+                'subject_code'=> Subject::generateUniqueCode(),
+                'course_code' => trim($record['course_code'] ?? '') ?: null,
+                'semester'    => in_array(trim($record['semester'] ?? ''), ['1st', '2nd', '3rd'], true) ? trim($record['semester']) : null,
                 'class_id'    => $class?->id,
                 'description' => trim($record['description'] ?? ''),
+                'status'      => true,
+                'created_by'  => $request->user()->id,
             ]);
             $imported++;
         }
@@ -135,5 +158,15 @@ class SubjectController extends Controller
         }
 
         return redirect()->route('admin.subjects.index')->with('success', $msg);
+    }
+
+    public function toggleStatus(Subject $subject)
+    {
+        $subject->update(['status' => !$subject->status]);
+        $action = $subject->status ? 'Activated' : 'Deactivated';
+
+        AuditLog::record("$action Subject", "$action subject: {$subject->name}");
+
+        return redirect()->route('admin.subjects.index')->with('success', "Subject {$action} successfully.");
     }
 }
