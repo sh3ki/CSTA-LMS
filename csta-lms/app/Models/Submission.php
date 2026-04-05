@@ -11,6 +11,8 @@ class Submission extends Model
         'student_id',
         'file_path',
         'file_name',
+        'submission_note',
+        'allow_resubmit',
         'grade',
         'feedback',
         'submitted_at',
@@ -20,6 +22,7 @@ class Submission extends Model
     {
         return [
             'submitted_at' => 'datetime',
+            'allow_resubmit' => 'boolean',
             'grade'        => 'decimal:2',
         ];
     }
@@ -32,5 +35,10 @@ class Submission extends Model
     public function student()
     {
         return $this->belongsTo(User::class, 'student_id');
+    }
+
+    public function histories()
+    {
+        return $this->hasMany(SubmissionHistory::class)->orderByDesc('attempt_number');
     }
 }
