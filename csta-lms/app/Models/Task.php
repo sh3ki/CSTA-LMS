@@ -9,6 +9,7 @@ class Task extends Model
     protected $fillable = [
         'subject_id',
         'title',
+        'task_type',
         'description',
         'due_date',
         'file_path',
