@@ -94,8 +94,10 @@
                     <th>ID Number</th>
                     <th>Status</th>
                     <th>File</th>
+                    <th>Notes</th>
                     <th>Submitted At</th>
                     <th>Grade</th>
+                    <th>Attempts</th>
                     <th style="text-align:right;">Actions</th>
                 </tr>
             </thead>
@@ -130,6 +132,9 @@
                                 <span style="color:#dadce0;font-size:13px;">—</span>
                             @endif
                         </td>
+                        <td style="font-size:13px;color:#5f6368;max-width:220px;">
+                            {{ $submission && $submission->submission_note ? \Illuminate\Support\Str::limit($submission->submission_note, 50) : '—' }}
+                        </td>
                         <td style="font-size:13px;color:#5f6368;">
                             {{ $submission && $submission->submitted_at ? $submission->submitted_at->format('M d, Y h:i A') : '—' }}
                         </td>
@@ -148,8 +153,41 @@
                             @endif
                         </td>
                         <td>
+                            @if($submission)
+                                @php $attempts = max(1, $submission->histories->count()); @endphp
+                                <span style="font-size:13px;font-weight:600;color:#202124;">{{ $attempts }}</span>
+                            @else
+                                <span style="color:#dadce0;font-size:13px;">—</span>
+                            @endif
+                        </td>
+                        <td>
                             <div class="d-flex align-items-center justify-content-end gap-1">
                                 @if($submission)
+                                    <form action="{{ route('teacher.submissions.toggleResubmit', $submission) }}" method="POST" class="d-inline"
+                                          onsubmit="return confirm('Are you sure you want to {{ $submission->allow_resubmit ? 'disable' : 'enable' }} resubmission for {{ $student->full_name }}?');">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="btn-icon" title="{{ $submission->allow_resubmit ? 'Disable Resubmit' : 'Allow Resubmit' }}">
+                                            <span class="material-icons" style="color:{{ $submission->allow_resubmit ? '#34a853' : '#5f6368' }};">restart_alt</span>
+                                        </button>
+                                    </form>
+                                    @php
+                                        $historyPayload = $submission->histories->map(function ($history) {
+                                            return [
+                                                'id' => $history->id,
+                                                'attempt_number' => $history->attempt_number,
+                                                'file_name' => $history->file_name,
+                                                'submitted_at' => optional($history->submitted_at)->format('M d, Y h:i A'),
+                                                'submission_note' => $history->submission_note,
+                                            ];
+                                        })->values()->all();
+                                    @endphp
+                                    <button class="btn-icon" title="View History"
+                                        data-bs-toggle="modal" data-bs-target="#historyModal"
+                                        data-student_name="{{ $student->full_name }}"
+                                        data-history='@json($historyPayload)'>
+                                        <span class="material-icons" style="color:#5f6368;">history</span>
+                                    </button>
                                     <button class="btn-icon" title="Grade"
                                         data-bs-toggle="modal" data-bs-target="#gradeModal"
                                         data-submission_id="{{ $submission->id }}"
@@ -165,7 +203,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8" class="text-center py-5">
+                        <td colspan="10" class="text-center py-5">
                             <span class="material-icons d-block mb-2" style="font-size:48px;color:#dadce0;">groups</span>
                             <div style="color:#5f6368;font-size:15px;">No students enrolled in this class.</div>
                         </td>
@@ -173,6 +211,24 @@
                 @endforelse
             </tbody>
         </table>
+    </div>
+</div>
+
+<div class="modal fade" id="historyModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" style="border-radius:16px;border:none;box-shadow:0 8px 32px rgba(0,0,0,.15);">
+            <div class="modal-header">
+                <h5 class="modal-title">Submission History</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p id="historyStudentName" style="font-size:14px;color:#5f6368;margin-bottom:14px;"></p>
+                <div id="historyItems" class="d-flex flex-column gap-2"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -243,6 +299,42 @@
         document.getElementById('grade_value').max     = btn.dataset.total_points;
         document.getElementById('grade_max').textContent = `/${btn.dataset.total_points}`;
         document.getElementById('grade_feedback').value = btn.dataset.feedback || '';
+    });
+
+    document.getElementById('historyModal').addEventListener('show.bs.modal', event => {
+        const btn = event.relatedTarget;
+        const studentName = btn.dataset.student_name;
+        const histories = JSON.parse(btn.dataset.history || '[]');
+
+        document.getElementById('historyStudentName').textContent = `History for: ${studentName}`;
+
+        const container = document.getElementById('historyItems');
+        if (!histories.length) {
+            container.innerHTML = '<div class="text-center py-3" style="color:#5f6368;font-size:14px;">No history available.</div>';
+            return;
+        }
+
+        const baseDownload = '{{ route('teacher.submission-histories.download', '__HISTORY_ID__') }}';
+        container.innerHTML = histories.map(item => {
+            const downloadLink = baseDownload.replace('__HISTORY_ID__', item.id);
+            const note = item.submission_note ? `<div style="margin-top:6px;color:#5f6368;font-size:13px;white-space:pre-line;">${item.submission_note}</div>` : '';
+
+            return `
+                <div style="border:1px solid #e8eaed;border-radius:10px;padding:12px 14px;background:#f8f9fa;">
+                    <div class="d-flex align-items-center justify-content-between gap-2 flex-wrap">
+                        <div>
+                            <div style="font-size:13px;font-weight:600;color:#202124;">Attempt #${item.attempt_number}</div>
+                            <div style="font-size:12px;color:#5f6368;">${item.submitted_at || '-'}</div>
+                        </div>
+                        <a href="${downloadLink}" style="font-size:13px;color:#800020;text-decoration:none;">
+                            <span class="material-icons align-middle" style="font-size:14px;">download</span>
+                            ${item.file_name}
+                        </a>
+                    </div>
+                    ${note}
+                </div>
+            `;
+        }).join('');
     });
 </script>
 @endpush
