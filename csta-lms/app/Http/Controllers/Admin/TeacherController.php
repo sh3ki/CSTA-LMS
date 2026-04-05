@@ -7,6 +7,7 @@ use App\Models\AuditLog;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class TeacherController extends Controller
 {
@@ -19,6 +20,7 @@ class TeacherController extends Controller
             $query->where(function ($qq) use ($q) {
                 $qq->where('full_name', 'like', "%$q%")
                    ->orWhere('id_number', 'like', "%$q%")
+                   ->orWhere('email', 'like', "%$q%")
                    ->orWhere('contact_number', 'like', "%$q%");
             });
         }
@@ -36,15 +38,24 @@ class TeacherController extends Controller
     {
         $request->validate([
             'full_name'      => 'required|string|max:255',
+            'email'          => 'required|email|max:255|unique:users,email',
             'contact_number' => 'nullable|string|max:20',
             'id_number'      => 'required|string|max:50|unique:users,id_number',
             'password'       => 'required|string|min:6|confirmed',
+            'profile_picture'=> 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
         ]);
+
+        $photoPath = null;
+        if ($request->hasFile('profile_picture')) {
+            $photoPath = $request->file('profile_picture')->store('profile-pictures', 'public');
+        }
 
         $teacher = User::create([
             'full_name'      => $request->full_name,
+            'email'          => $request->email,
             'contact_number' => $request->contact_number,
             'id_number'      => $request->id_number,
+            'profile_picture'=> $photoPath,
             'password'       => Hash::make($request->password),
             'role'           => 'teacher',
             'status'         => true,
@@ -59,15 +70,27 @@ class TeacherController extends Controller
     {
         $request->validate([
             'full_name'      => 'required|string|max:255',
+            'email'          => 'required|email|max:255|unique:users,email,' . $teacher->id,
             'contact_number' => 'nullable|string|max:20',
             'id_number'      => 'required|string|max:50|unique:users,id_number,' . $teacher->id,
+            'profile_picture'=> 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
         ]);
 
-        $teacher->update([
+        $data = [
             'full_name'      => $request->full_name,
+            'email'          => $request->email,
             'contact_number' => $request->contact_number,
             'id_number'      => $request->id_number,
-        ]);
+        ];
+
+        if ($request->hasFile('profile_picture')) {
+            if ($teacher->profile_picture) {
+                Storage::disk('public')->delete($teacher->profile_picture);
+            }
+            $data['profile_picture'] = $request->file('profile_picture')->store('profile-pictures', 'public');
+        }
+
+        $teacher->update($data);
 
         AuditLog::record('Edit Teacher', "Updated teacher account: {$teacher->full_name} ({$teacher->id_number})");
 
@@ -139,6 +162,7 @@ class TeacherController extends Controller
 
             User::create([
                 'id_number'      => trim($record['id_number']),
+                'email'          => trim($record['email'] ?? '') ?: null,
                 'full_name'      => trim($record['full_name']),
                 'contact_number' => trim($record['contact_number'] ?? ''),
                 'password'       => Hash::make(trim($record['password'])),
