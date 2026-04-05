@@ -297,9 +297,14 @@
             <div class="brand-sub">Colegio De Sta. Teresa De Avila</div>
         </div>
     </a>
-    <a href="{{ route('login') }}" class="btn btn-primary rounded-pill px-4" style="background:#800020;border:none;font-weight:500;">
-        Sign In
-    </a>
+    <div class="d-flex gap-2">
+        <a href="{{ route('register') }}" class="btn btn-outline-secondary rounded-pill px-4" style="font-weight:500;">
+            Sign Up
+        </a>
+        <a href="{{ route('login') }}" class="btn btn-primary rounded-pill px-4" style="background:#800020;border:none;font-weight:500;">
+            Sign In
+        </a>
+    </div>
 </nav>
 
 <!-- ── Hero ── -->
@@ -313,6 +318,10 @@
                     <a href="{{ route('login') }}" class="btn-hero-primary">
                         <span class="material-icons align-middle me-1" style="font-size:18px;">login</span>
                         Get Started
+                    </a>
+                    <a href="{{ route('register') }}" class="btn-hero-outline">
+                        <span class="material-icons align-middle me-1" style="font-size:18px;">person_add</span>
+                        Sign Up
                     </a>
                     <a href="#features" class="btn-hero-outline">Learn More</a>
                 </div>
