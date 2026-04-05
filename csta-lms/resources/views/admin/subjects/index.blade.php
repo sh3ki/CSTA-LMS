@@ -43,11 +43,16 @@
                     </option>
                 @endforeach
             </select>
+            <select name="status" class="form-select" style="width:auto;font-size:14px;min-width:130px;">
+                <option value="">All Status</option>
+                <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>Active</option>
+                <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>Inactive</option>
+            </select>
             <button type="submit" class="btn btn-primary rounded-pill px-3">
                 <span class="material-icons align-middle" style="font-size:16px;">filter_list</span>
                 Filter
             </button>
-            @if(request()->hasAny(['search', 'class_id']))
+            @if(request()->hasAny(['search', 'class_id', 'status']))
                 <a href="{{ route('admin.subjects.index') }}" class="btn btn-light rounded-pill px-3">Reset</a>
             @endif
         </form>
@@ -67,8 +72,11 @@
                 <tr>
                     <th>#</th>
                     <th>Subject Name</th>
+                    <th>Class Code</th>
+                    <th>Course / Semester</th>
                     <th>Assigned Class</th>
                     <th>Description</th>
+                    <th>Status</th>
                     <th style="text-align:right;">Actions</th>
                 </tr>
             </thead>
@@ -84,6 +92,8 @@
                                 <span style="font-weight:500;">{{ $subject->name }}</span>
                             </div>
                         </td>
+                        <td><code style="background:#f1f3f4;padding:3px 8px;border-radius:6px;font-size:12px;color:#202124;">{{ $subject->subject_code ?? '—' }}</code></td>
+                        <td style="font-size:13px;color:#5f6368;">{{ $subject->course_code ?: '—' }} {{ $subject->semester ? '· ' . $subject->semester : '' }}</td>
                         <td>
                             @if($subject->schoolClass)
                                 <span class="badge rounded-pill" style="background:#fce8e6;color:#ea4335;font-size:12px;font-weight:500;padding:5px 12px;">
@@ -97,15 +107,33 @@
                             {{ $subject->description ? Str::limit($subject->description, 80) : '—' }}
                         </td>
                         <td>
+                            @if($subject->status)
+                                <span class="badge-active">Active</span>
+                            @else
+                                <span class="badge-inactive">Inactive</span>
+                            @endif
+                        </td>
+                        <td>
                             <div class="d-flex align-items-center justify-content-end gap-1">
                                 <button class="btn-icon" title="Edit"
                                     data-bs-toggle="modal" data-bs-target="#editModal"
                                     data-id="{{ $subject->id }}"
                                     data-name="{{ $subject->name }}"
                                     data-class_id="{{ $subject->class_id }}"
+                                    data-course_code="{{ $subject->course_code }}"
+                                    data-semester="{{ $subject->semester }}"
+                                    data-status="{{ $subject->status ? 1 : 0 }}"
                                     data-description="{{ $subject->description }}">
                                     <span class="material-icons" style="color:#800020;">edit</span>
                                 </button>
+
+                                <form action="{{ route('admin.subjects.toggleStatus', $subject) }}" method="POST" class="d-inline">
+                                    @csrf @method('PATCH')
+                                    <button type="submit" class="btn-icon" title="{{ $subject->status ? 'Deactivate' : 'Activate' }}"
+                                        onclick="return confirm('{{ $subject->status ? 'Deactivate' : 'Activate' }} this subject?')">
+                                        <span class="material-icons" style="color:{{ $subject->status ? '#f9ab00' : '#34a853' }};">{{ $subject->status ? 'block' : 'check_circle' }}</span>
+                                    </button>
+                                </form>
 
                                 <button class="btn-icon" title="Delete"
                                     data-bs-toggle="modal" data-bs-target="#deleteModal"
@@ -118,7 +146,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="text-center py-5">
+                        <td colspan="8" class="text-center py-5">
                             <span class="material-icons d-block mb-2" style="font-size:48px;color:#dadce0;">menu_book</span>
                             <div style="color:#5f6368;font-size:15px;">No subjects found.</div>
                             <button class="btn btn-primary rounded-pill mt-3 px-4" data-bs-toggle="modal" data-bs-target="#addModal">
@@ -137,7 +165,7 @@
                 <div style="font-size:13px;color:#5f6368;">
                     Showing {{ $subjects->firstItem() }}–{{ $subjects->lastItem() }} of {{ $subjects->total() }} subjects
                 </div>
-                {{ $subjects->links() }}
+                {{ $subjects->links('pagination::bootstrap-5') }}
             </div>
         </div>
     @endif
@@ -178,10 +206,29 @@
                                 @endforeach
                             </select>
                         </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Course Code</label>
+                            <input type="text" name="course_code" class="form-control" placeholder="e.g. CS101" value="{{ old('course_code') }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Semester</label>
+                            <select name="semester" class="form-select">
+                                <option value="">Select Semester</option>
+                                <option value="1st">1st</option>
+                                <option value="2nd">2nd</option>
+                                <option value="3rd">3rd</option>
+                            </select>
+                        </div>
                         <div class="col-12">
                             <label class="form-label">Description</label>
                             <textarea name="description" class="form-control" rows="3"
                                 placeholder="Brief description of this subject...">{{ old('description') }}</textarea>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="status" value="1" id="add_status" checked>
+                                <label class="form-check-label" for="add_status">Active</label>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -227,9 +274,28 @@
                                 @endforeach
                             </select>
                         </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Course Code</label>
+                            <input type="text" name="course_code" id="edit_course_code" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Semester</label>
+                            <select name="semester" id="edit_semester" class="form-select">
+                                <option value="">Select Semester</option>
+                                <option value="1st">1st</option>
+                                <option value="2nd">2nd</option>
+                                <option value="3rd">3rd</option>
+                            </select>
+                        </div>
                         <div class="col-12">
                             <label class="form-label">Description</label>
                             <textarea name="description" id="edit_description" class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="status" value="1" id="edit_status">
+                                <label class="form-check-label" for="edit_status">Active</label>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -319,6 +385,9 @@
         document.getElementById('editSubjectForm').action  = `/admin/subjects/${btn.dataset.id}`;
         document.getElementById('edit_name').value         = btn.dataset.name;
         document.getElementById('edit_class_id').value     = btn.dataset.class_id || '';
+        document.getElementById('edit_course_code').value  = btn.dataset.course_code || '';
+        document.getElementById('edit_semester').value     = btn.dataset.semester || '';
+        document.getElementById('edit_status').checked     = btn.dataset.status === '1';
         document.getElementById('edit_description').value  = btn.dataset.description || '';
     });
 
