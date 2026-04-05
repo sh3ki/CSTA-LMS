@@ -136,6 +136,34 @@
                                placeholder="e.g. 09XX-XXX-XXXX">
                         @error('contact_number')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
+                    <div class="col-md-12">
+                        <label for="email" class="form-label" style="font-size:12px;font-weight:600;color:#5f6368;text-transform:uppercase;letter-spacing:.5px;">Email Address <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control @error('email') is-invalid @enderror"
+                               id="email" name="email"
+                               value="{{ old('email', auth()->user()->email) }}"
+                               required>
+                        @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    </div>
+                    @if(auth()->user()->role === 'student')
+                        <div class="col-md-6">
+                            <label for="course" class="form-label" style="font-size:12px;font-weight:600;color:#5f6368;text-transform:uppercase;letter-spacing:.5px;">Course</label>
+                            <input type="text" class="form-control @error('course') is-invalid @enderror"
+                                   id="course" name="course"
+                                   value="{{ old('course', auth()->user()->course) }}"
+                                   placeholder="e.g. BSIT">
+                            @error('course')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="col-md-6">
+                            <label for="year_level" class="form-label" style="font-size:12px;font-weight:600;color:#5f6368;text-transform:uppercase;letter-spacing:.5px;">Year Level</label>
+                            <select id="year_level" name="year_level" class="form-select @error('year_level') is-invalid @enderror">
+                                <option value="">Select Year Level</option>
+                                @foreach(['1st Year','2nd Year','3rd Year','4th Year'] as $year)
+                                    <option value="{{ $year }}" {{ old('year_level', auth()->user()->year_level) === $year ? 'selected' : '' }}>{{ $year }}</option>
+                                @endforeach
+                            </select>
+                            @error('year_level')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
+                    @endif
                 </div>
                 <div class="d-flex justify-content-end mt-4">
                     <button type="submit" class="btn btn-primary rounded-pill px-4"
