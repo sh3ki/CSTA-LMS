@@ -12,6 +12,10 @@
         </h1>
         <p class="page-subtitle">View your assigned subjects and enrolled students.</p>
     </div>
+    <button class="btn btn-primary rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#addSubjectModal">
+        <span class="material-icons align-middle me-1" style="font-size:16px;">add</span>
+        Add Subject
+    </button>
 </div>
 
 <!-- Filter Bar -->
@@ -29,9 +33,9 @@
             </div>
             <select name="class_id" class="form-select" style="width:auto;font-size:14px;min-width:180px;">
                 <option value="">All Classes</option>
-                @foreach($classes as $class)
-                    <option value="{{ $class->id }}" {{ request('class_id') == $class->id ? 'selected' : '' }}>
-                        {{ $class->name }}
+                @foreach($teacherClasses as $teacherClass)
+                    <option value="{{ $teacherClass->id }}" {{ request('class_id') == $teacherClass->id ? 'selected' : '' }}>
+                        {{ $teacherClass->name }}
                     </option>
                 @endforeach
             </select>
@@ -77,6 +81,17 @@
                         @if($subject->schoolClass)
                             <div style="font-size:13px;color:rgba(255,255,255,.85);margin-bottom:4px;">
                                 {{ $subject->schoolClass->name }}
+                            </div>
+                        @endif
+                        @if($subject->subject_code)
+                            <div style="font-size:11px;color:rgba(255,255,255,.9);margin-bottom:3px;">Code: {{ $subject->subject_code }}</div>
+                        @endif
+                        @if($subject->course_code || $subject->semester)
+                            <div style="font-size:11px;color:rgba(255,255,255,.85);margin-bottom:3px;">
+                                {{ $subject->course_code ?: 'Course code n/a' }}
+                                @if($subject->semester)
+                                    &middot; {{ $subject->semester }} sem
+                                @endif
                             </div>
                         @endif
                         @if($subject->description)
@@ -132,9 +147,87 @@
         <div style="font-size:13px;color:#5f6368;">
             Showing {{ $subjects->firstItem() }}–{{ $subjects->lastItem() }} of {{ $subjects->total() }} subjects
         </div>
-        {{ $subjects->links() }}
+        {{ $subjects->links('pagination::bootstrap-5') }}
     </div>
 @endif
+
+<div class="modal fade" id="addSubjectModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius:16px;border:none;box-shadow:0 8px 32px rgba(0,0,0,.15);">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Subject</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ route('teacher.subjects.store') }}" method="POST">
+                @csrf
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Subject Name <span class="text-danger">*</span></label>
+                            <input type="text" name="name" class="form-control" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Assign Class <span class="text-danger">*</span></label>
+                            <select name="class_id" class="form-select" required>
+                                <option value="">Select class</option>
+                                @foreach($teacherClasses as $teacherClass)
+                                    <option value="{{ $teacherClass->id }}">{{ $teacherClass->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Course Code</label>
+                            <input type="text" name="course_code" class="form-control" placeholder="e.g. CS101">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Semester <span class="text-danger">*</span></label>
+                            <select name="semester" class="form-select" required>
+                                <option value="">Select semester</option>
+                                <option value="1st">1st</option>
+                                <option value="2nd">2nd</option>
+                                <option value="3rd">3rd</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Description</label>
+                            <textarea name="description" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light rounded-pill px-3" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-3">Create Subject</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="subjectCodeModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:420px;">
+        <div class="modal-content" style="border-radius:16px;border:none;box-shadow:0 8px 32px rgba(0,0,0,.15);">
+            <div class="modal-header">
+                <h5 class="modal-title">Subject Code Generated</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div style="font-size:14px;color:#5f6368;margin-bottom:10px;">
+                    {{ session('created_subject_name') }}
+                </div>
+                <div id="newSubjectCode" style="font-family:'Google Sans',Roboto,sans-serif;font-size:22px;font-weight:700;letter-spacing:1px;color:#800020;margin-bottom:16px;">
+                    {{ session('created_subject_code') }}
+                </div>
+                <button type="button" class="btn btn-outline-primary rounded-pill px-4" id="copyNewSubjectCodeBtn">
+                    <span class="material-icons align-middle me-1" style="font-size:16px;">content_copy</span>
+                    Copy Code
+                </button>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 @endsection
 
@@ -146,4 +239,41 @@
     .btn-primary:hover { background:#5c0016;border-color:#5c0016; }
     .subject-card .card:hover { box-shadow:0 4px 16px rgba(0,0,0,.18) !important;transform:translateY(-2px); }
 </style>
+@endpush
+
+@push('scripts')
+<script>
+(() => {
+    const copyText = async (text) => {
+        if (!text) return;
+        try {
+            await navigator.clipboard.writeText(text);
+            return true;
+        } catch (e) {
+            const input = document.createElement('input');
+            input.value = text;
+            document.body.appendChild(input);
+            input.select();
+            document.execCommand('copy');
+            document.body.removeChild(input);
+            return true;
+        }
+    };
+
+    const copyBtn = document.getElementById('copyNewSubjectCodeBtn');
+    if (copyBtn) {
+        copyBtn.addEventListener('click', async () => {
+            const code = document.getElementById('newSubjectCode')?.textContent?.trim();
+            const ok = await copyText(code);
+            if (ok) {
+                copyBtn.innerHTML = '<span class="material-icons align-middle me-1" style="font-size:16px;">check</span>Copied';
+            }
+        });
+    }
+
+    @if(session('created_subject_code'))
+        new bootstrap.Modal(document.getElementById('subjectCodeModal')).show();
+    @endif
+})();
+</script>
 @endpush
