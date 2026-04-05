@@ -447,6 +447,11 @@
                     Sign In
                 </button>
             </form>
+
+            <div class="text-center mt-3" style="font-size:13px;color:#5f6368;">
+                Don't have an account?
+                <a href="{{ route('register') }}" style="color:#800020;text-decoration:none;font-weight:600;">Sign up</a>
+            </div>
         </div>
 
         <a href="{{ route('landing') }}" class="back-link">
