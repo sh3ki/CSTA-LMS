@@ -65,6 +65,7 @@
                 <tr>
                     <th>#</th>
                     <th>Title</th>
+                    <th>Type</th>
                     <th>Subject</th>
                     <th>File</th>
                     <th>Uploaded</th>
@@ -106,6 +107,9 @@
                             </div>
                         </td>
                         <td>
+                            <span class="badge rounded-pill" style="background:#f1f3f4;color:#3c4043;font-size:12px;">{{ $resource->resource_type }}</span>
+                        </td>
+                        <td>
                             <span class="badge rounded-pill" style="background:#fce8e6;color:#ea4335;font-size:12px;font-weight:500;padding:5px 12px;">
                                 {{ $resource->subject->name }}
                             </span>
@@ -126,6 +130,7 @@
                                     data-bs-toggle="modal" data-bs-target="#editModal"
                                     data-id="{{ $resource->id }}"
                                     data-title="{{ $resource->title }}"
+                                    data-resource_type="{{ $resource->resource_type }}"
                                     data-subject_id="{{ $resource->subject_id }}"
                                     data-description="{{ $resource->description }}"
                                     data-file_name="{{ $resource->file_name }}">
@@ -142,7 +147,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="text-center py-5">
+                        <td colspan="7" class="text-center py-5">
                             <span class="material-icons d-block mb-2" style="font-size:48px;color:#dadce0;">folder_open</span>
                             <div style="color:#5f6368;font-size:15px;">No resources uploaded yet.</div>
                             <button class="btn btn-primary rounded-pill mt-3 px-4" data-bs-toggle="modal" data-bs-target="#addModal">
@@ -161,7 +166,7 @@
                 <div style="font-size:13px;color:#5f6368;">
                     Showing {{ $resources->firstItem() }}–{{ $resources->lastItem() }} of {{ $resources->total() }} resources
                 </div>
-                {{ $resources->links() }}
+                {{ $resources->links('pagination::bootstrap-5') }}
             </div>
         </div>
     @endif
@@ -190,7 +195,15 @@
                                 placeholder="e.g. Chapter 1 Notes" value="{{ old('title') }}" required>
                             @error('title')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
-                        <div class="col-12">
+                        <div class="col-md-6">
+                            <label class="form-label">Resource Type <span class="text-danger">*</span></label>
+                            <select name="resource_type" class="form-select" required>
+                                @foreach(['Course Syllabus', 'Lesson', 'Others'] as $type)
+                                    <option value="{{ $type }}" {{ old('resource_type', 'Others') === $type ? 'selected' : '' }}>{{ $type }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6">
                             <label class="form-label">Subject <span class="text-danger">*</span></label>
                             <select name="subject_id" class="form-select @error('subject_id') is-invalid @enderror" required>
                                 <option value="">— Select Subject —</option>
@@ -248,7 +261,15 @@
                             <label class="form-label">Title <span class="text-danger">*</span></label>
                             <input type="text" name="title" id="edit_title" class="form-control" required>
                         </div>
-                        <div class="col-12">
+                        <div class="col-md-6">
+                            <label class="form-label">Resource Type <span class="text-danger">*</span></label>
+                            <select name="resource_type" id="edit_resource_type" class="form-select" required>
+                                @foreach(['Course Syllabus', 'Lesson', 'Others'] as $type)
+                                    <option value="{{ $type }}">{{ $type }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6">
                             <label class="form-label">Subject <span class="text-danger">*</span></label>
                             <select name="subject_id" id="edit_subject_id" class="form-select" required>
                                 <option value="">— Select Subject —</option>
@@ -325,6 +346,7 @@
         const btn = event.relatedTarget;
         document.getElementById('editResourceForm').action = `/teacher/resources/${btn.dataset.id}`;
         document.getElementById('edit_title').value        = btn.dataset.title;
+        document.getElementById('edit_resource_type').value = btn.dataset.resource_type;
         document.getElementById('edit_subject_id').value   = btn.dataset.subject_id;
         document.getElementById('edit_description').value  = btn.dataset.description || '';
         document.getElementById('edit_file_name').textContent = btn.dataset.file_name;
