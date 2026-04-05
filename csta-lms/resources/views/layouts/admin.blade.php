@@ -443,6 +443,12 @@
         .pagination .page-item.active .page-link {
             background: #800020;
             border-color: #800020;
+            color: #fff;
+        }
+
+        .pagination svg {
+            width: 14px;
+            height: 14px;
         }
 
         /* Toast */
@@ -580,6 +586,18 @@
        class="sidebar-link {{ request()->routeIs('admin.subjects*') ? 'active' : '' }}">
         <span class="material-icons">menu_book</span>
         Subjects
+    </a>
+
+    <a href="{{ route('admin.resources.index') }}"
+       class="sidebar-link {{ request()->routeIs('admin.resources*') ? 'active' : '' }}">
+        <span class="material-icons">folder_open</span>
+        Resources
+    </a>
+
+    <a href="{{ route('admin.tasks.index') }}"
+       class="sidebar-link {{ request()->routeIs('admin.tasks*') ? 'active' : '' }}">
+        <span class="material-icons">assignment</span>
+        Tasks
     </a>
 
     <div class="sidebar-divider"></div>
