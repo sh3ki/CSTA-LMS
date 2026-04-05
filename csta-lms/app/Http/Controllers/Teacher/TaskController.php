@@ -7,8 +7,10 @@ use App\Models\AuditLog;
 use App\Models\SchoolClass;
 use App\Models\Subject;
 use App\Models\Submission;
+use App\Models\SubmissionHistory;
 use App\Models\Task;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class TaskController extends Controller
@@ -18,16 +20,23 @@ class TaskController extends Controller
      */
     private function ownsSubject($subjectId): bool
     {
-        $userId   = auth()->user()->id;
-        $classIds = SchoolClass::where('teacher_id', $userId)->pluck('id');
-        return Subject::where('id', $subjectId)->whereIn('class_id', $classIds)->exists();
+        $teacher = Auth::user();
+        if (!$teacher) {
+            return false;
+        }
+
+        return Subject::whereKey($subjectId)
+            ->whereHas('schoolClass', function ($query) use ($teacher) {
+                $query->where('teacher_id', $teacher->id);
+            })
+            ->exists();
     }
 
     public function index(Request $request)
     {
-        $teacher    = auth()->user();
-        $classIds   = SchoolClass::where('teacher_id', $teacher->id)->pluck('id');
-        $subjectIds = Subject::whereIn('class_id', $classIds)->pluck('id');
+        $teacher    = $request->user();
+        $classIds   = SchoolClass::where('teacher_id', $teacher->id)->where('status', true)->pluck('id');
+        $subjectIds = Subject::where('status', true)->whereIn('class_id', $classIds)->pluck('id');
 
         $query = Task::with(['subject.schoolClass', 'submissions'])
             ->whereIn('subject_id', $subjectIds);
@@ -53,7 +62,7 @@ class TaskController extends Controller
         }
 
         $tasks    = $query->orderByDesc('created_at')->paginate(10)->withQueryString();
-        $subjects = Subject::whereIn('class_id', $classIds)->orderBy('name')->get();
+        $subjects = Subject::where('status', true)->whereIn('class_id', $classIds)->orderBy('name')->get();
 
         return view('teacher.tasks.index', compact('tasks', 'subjects'));
     }
@@ -63,6 +72,7 @@ class TaskController extends Controller
         $request->validate([
             'subject_id'   => 'required|exists:subjects,id',
             'title'        => 'required|string|max:255',
+            'task_type'    => 'required|in:Activity,Quiz,Assignment,Others',
             'description'  => 'nullable|string',
             'due_date'     => 'required|date|after:now',
             'total_points' => 'required|integer|min:1|max:1000',
@@ -76,10 +86,11 @@ class TaskController extends Controller
         $data = [
             'subject_id'   => $request->subject_id,
             'title'        => $request->title,
+            'task_type'    => $request->task_type,
             'description'  => $request->description,
             'due_date'     => $request->due_date,
             'total_points' => $request->total_points,
-            'created_by'   => auth()->user()->id,
+            'created_by'   => $request->user()->id,
         ];
 
         if ($request->hasFile('file')) {
@@ -105,13 +116,36 @@ class TaskController extends Controller
             abort(403, 'Unauthorized access.');
         }
 
-        $task->load(['subject.schoolClass.students', 'submissions.student']);
+        $task->load([
+            'subject.schoolClass.students',
+            'submissions.student',
+            'submissions.histories',
+        ]);
 
         // Get all students in the class and their submission status
         $students    = $task->subject->schoolClass->students ?? collect();
         $submissions = $task->submissions->keyBy('student_id');
 
         return view('teacher.tasks.show', compact('task', 'students', 'submissions'));
+    }
+
+    public function toggleSubmissionResubmit(Submission $submission)
+    {
+        if (!$this->ownsSubject($submission->task->subject_id)) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        $submission->update(['allow_resubmit' => !$submission->allow_resubmit]);
+
+        $state = $submission->allow_resubmit ? 'enabled' : 'disabled';
+        AuditLog::record(
+            'Toggle Submission Resubmission',
+            "Resubmission {$state} for {$submission->student->full_name} on task: {$submission->task->title}"
+        );
+
+        return redirect()
+            ->route('teacher.tasks.show', $submission->task_id)
+            ->with('success', "Resubmission {$state} for {$submission->student->full_name}.");
     }
 
     public function update(Request $request, Task $task)
@@ -123,6 +157,7 @@ class TaskController extends Controller
         $request->validate([
             'subject_id'   => 'required|exists:subjects,id',
             'title'        => 'required|string|max:255',
+            'task_type'    => 'required|in:Activity,Quiz,Assignment,Others',
             'description'  => 'nullable|string',
             'due_date'     => 'required|date',
             'total_points' => 'required|integer|min:1|max:1000',
@@ -136,6 +171,7 @@ class TaskController extends Controller
         $data = [
             'subject_id'   => $request->subject_id,
             'title'        => $request->title,
+            'task_type'    => $request->task_type,
             'description'  => $request->description,
             'due_date'     => $request->due_date,
             'total_points' => $request->total_points,
@@ -212,7 +248,8 @@ class TaskController extends Controller
             abort(404);
         }
 
-        return Storage::disk('public')->download($task->file_path, $task->file_name);
+        $disk = Storage::disk('public');
+        return response()->download($disk->path($task->file_path), $task->file_name);
     }
 
     public function downloadSubmission(Submission $submission)
@@ -225,6 +262,21 @@ class TaskController extends Controller
             abort(404);
         }
 
-        return Storage::disk('public')->download($submission->file_path, $submission->file_name);
+        $disk = Storage::disk('public');
+        return response()->download($disk->path($submission->file_path), $submission->file_name);
+    }
+
+    public function downloadSubmissionHistory(SubmissionHistory $history)
+    {
+        if (!$this->ownsSubject($history->task_id ? $history->task->subject_id : null)) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        if (!$history->file_path) {
+            abort(404);
+        }
+
+        $disk = Storage::disk('public');
+        return response()->download($disk->path($history->file_path), $history->file_name);
     }
 }
