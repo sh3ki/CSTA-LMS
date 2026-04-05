@@ -129,6 +129,7 @@
                 <tr>
                     <th>#</th>
                     <th>Task</th>
+                    <th>Type</th>
                     <th>Subject</th>
                     <th>Due Date</th>
                     <th>Points</th>
@@ -158,6 +159,9 @@
                                     @endif
                                 </div>
                             </div>
+                        </td>
+                        <td>
+                            <span class="badge rounded-pill" style="background:#f1f3f4;color:#3c4043;font-size:12px;">{{ $task->task_type }}</span>
                         </td>
                         <td>
                             <span class="badge rounded-pill" style="background:#fce8e6;color:#ea4335;font-size:12px;font-weight:500;padding:5px 12px;">
@@ -200,6 +204,7 @@
                                     data-bs-toggle="modal" data-bs-target="#editModal"
                                     data-id="{{ $task->id }}"
                                     data-title="{{ $task->title }}"
+                                    data-task_type="{{ $task->task_type }}"
                                     data-subject_id="{{ $task->subject_id }}"
                                     data-description="{{ $task->description }}"
                                     data-due_date="{{ $task->due_date->format('Y-m-d\TH:i') }}"
@@ -218,7 +223,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="text-center py-5">
+                        <td colspan="8" class="text-center py-5">
                             <span class="material-icons d-block mb-2" style="font-size:48px;color:#dadce0;">assignment</span>
                             <div style="color:#5f6368;font-size:15px;">No tasks created yet.</div>
                             <button class="btn btn-primary rounded-pill mt-3 px-4" data-bs-toggle="modal" data-bs-target="#addModal">
@@ -237,7 +242,7 @@
                 <div style="font-size:13px;color:#5f6368;">
                     Showing {{ $tasks->firstItem() }}–{{ $tasks->lastItem() }} of {{ $tasks->total() }} tasks
                 </div>
-                {{ $tasks->links() }}
+                {{ $tasks->links('pagination::bootstrap-5') }}
             </div>
         </div>
     @endif
@@ -267,12 +272,20 @@
                             @error('title')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
                         <div class="col-md-4">
+                            <label class="form-label">Task Type <span class="text-danger">*</span></label>
+                            <select name="task_type" class="form-select" required>
+                                @foreach(['Activity', 'Quiz', 'Assignment', 'Others'] as $type)
+                                    <option value="{{ $type }}" {{ old('task_type', 'Assignment') === $type ? 'selected' : '' }}>{{ $type }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-4">
                             <label class="form-label">Total Points <span class="text-danger">*</span></label>
                             <input type="number" name="total_points" class="form-control @error('total_points') is-invalid @enderror"
                                 value="{{ old('total_points', 100) }}" min="1" max="1000" required>
                             @error('total_points')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label">Subject <span class="text-danger">*</span></label>
                             <select name="subject_id" class="form-select @error('subject_id') is-invalid @enderror" required>
                                 <option value="">— Select Subject —</option>
@@ -284,7 +297,7 @@
                             </select>
                             @error('subject_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label">Due Date <span class="text-danger">*</span></label>
                             <input type="datetime-local" name="due_date" class="form-control @error('due_date') is-invalid @enderror"
                                 value="{{ old('due_date') }}" required>
@@ -336,10 +349,18 @@
                             <input type="text" name="title" id="edit_title" class="form-control" required>
                         </div>
                         <div class="col-md-4">
+                            <label class="form-label">Task Type <span class="text-danger">*</span></label>
+                            <select name="task_type" id="edit_task_type" class="form-select" required>
+                                @foreach(['Activity', 'Quiz', 'Assignment', 'Others'] as $type)
+                                    <option value="{{ $type }}">{{ $type }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-4">
                             <label class="form-label">Total Points <span class="text-danger">*</span></label>
                             <input type="number" name="total_points" id="edit_total_points" class="form-control" min="1" max="1000" required>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label">Subject <span class="text-danger">*</span></label>
                             <select name="subject_id" id="edit_subject_id" class="form-select" required>
                                 <option value="">— Select Subject —</option>
@@ -348,7 +369,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label">Due Date <span class="text-danger">*</span></label>
                             <input type="datetime-local" name="due_date" id="edit_due_date" class="form-control" required>
                         </div>
@@ -420,6 +441,7 @@
         const btn = event.relatedTarget;
         document.getElementById('editTaskForm').action     = `/teacher/tasks/${btn.dataset.id}`;
         document.getElementById('edit_title').value        = btn.dataset.title;
+        document.getElementById('edit_task_type').value    = btn.dataset.task_type;
         document.getElementById('edit_subject_id').value   = btn.dataset.subject_id;
         document.getElementById('edit_description').value  = btn.dataset.description || '';
         document.getElementById('edit_due_date').value     = btn.dataset.due_date;
