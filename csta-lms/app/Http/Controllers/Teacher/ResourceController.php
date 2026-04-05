@@ -8,6 +8,7 @@ use App\Models\Resource;
 use App\Models\SchoolClass;
 use App\Models\Subject;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class ResourceController extends Controller
@@ -17,16 +18,23 @@ class ResourceController extends Controller
      */
     private function ownsSubject($subjectId): bool
     {
-        $userId   = auth()->user()->id;
-        $classIds = SchoolClass::where('teacher_id', $userId)->pluck('id');
-        return Subject::where('id', $subjectId)->whereIn('class_id', $classIds)->exists();
+        $teacher = Auth::user();
+        if (!$teacher) {
+            return false;
+        }
+
+        return Subject::whereKey($subjectId)
+            ->whereHas('schoolClass', function ($query) use ($teacher) {
+                $query->where('teacher_id', $teacher->id);
+            })
+            ->exists();
     }
 
     public function index(Request $request)
     {
-        $teacher    = auth()->user();
-        $classIds   = SchoolClass::where('teacher_id', $teacher->id)->pluck('id');
-        $subjectIds = Subject::whereIn('class_id', $classIds)->pluck('id');
+        $teacher    = $request->user();
+        $classIds   = SchoolClass::where('teacher_id', $teacher->id)->where('status', true)->pluck('id');
+        $subjectIds = Subject::where('status', true)->whereIn('class_id', $classIds)->pluck('id');
 
         $query = Resource::with('subject.schoolClass')
             ->whereIn('subject_id', $subjectIds);
@@ -45,7 +53,7 @@ class ResourceController extends Controller
         }
 
         $resources = $query->orderByDesc('created_at')->paginate(10)->withQueryString();
-        $subjects  = Subject::whereIn('class_id', $classIds)->orderBy('name')->get();
+        $subjects  = Subject::where('status', true)->whereIn('class_id', $classIds)->orderBy('name')->get();
 
         return view('teacher.resources.index', compact('resources', 'subjects'));
     }
@@ -55,6 +63,7 @@ class ResourceController extends Controller
         $request->validate([
             'subject_id'  => 'required|exists:subjects,id',
             'title'       => 'required|string|max:255',
+            'resource_type' => 'required|in:Course Syllabus,Lesson,Others',
             'description' => 'nullable|string',
             'file'        => 'required|file|max:20480', // 20MB max
         ]);
@@ -72,11 +81,12 @@ class ResourceController extends Controller
         Resource::create([
             'subject_id'  => $request->subject_id,
             'title'       => $request->title,
+            'resource_type' => $request->resource_type,
             'description' => $request->description,
             'file_path'   => $path,
             'file_name'   => $fileName,
             'file_type'   => strtolower($fileType),
-            'uploaded_by' => auth()->user()->id,
+            'uploaded_by' => $request->user()->id,
         ]);
 
         AuditLog::record('Upload Resource', "Uploaded resource: {$request->title}");
@@ -98,6 +108,7 @@ class ResourceController extends Controller
         $request->validate([
             'title'       => 'required|string|max:255',
             'subject_id'  => 'required|exists:subjects,id',
+            'resource_type' => 'required|in:Course Syllabus,Lesson,Others',
             'description' => 'nullable|string',
             'file'        => 'nullable|file|max:20480',
         ]);
@@ -109,6 +120,7 @@ class ResourceController extends Controller
         $data = [
             'title'       => $request->title,
             'subject_id'  => $request->subject_id,
+            'resource_type' => $request->resource_type,
             'description' => $request->description,
         ];
 
@@ -159,6 +171,7 @@ class ResourceController extends Controller
             abort(403, 'Unauthorized access.');
         }
 
-        return Storage::disk('public')->download($resource->file_path, $resource->file_name);
+        $disk = Storage::disk('public');
+        return response()->download($disk->path($resource->file_path), $resource->file_name);
     }
 }
