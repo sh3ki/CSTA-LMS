@@ -64,6 +64,29 @@
         .alert-success.alert-slim { background:#e6f4ea;border:none;color:#137333; }
         .alert-danger.alert-slim { background:#fce8e6;border:none;color:#c5221f; }
 
+        /* Pagination */
+        .pagination { margin: 0; gap: 2px; }
+        .pagination .page-link {
+            border-radius: 8px;
+            border: 1px solid #dadce0;
+            color: #5f6368;
+            font-size: 13px;
+            min-width: 36px;
+            text-align: center;
+            padding: 6px 10px;
+        }
+        .pagination .page-item.active .page-link {
+            background: #e6f4ea;
+            border-color: #cce7d4;
+            color: #137333;
+            font-weight: 600;
+        }
+        .pagination .page-item.disabled .page-link {
+            color: #9aa0a6;
+            background: #f8f9fa;
+        }
+        .pagination svg { width: 14px; height: 14px; }
+
         .sidebar-overlay { display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:899; }
 
         @media (max-width: 992px) {
@@ -141,8 +164,16 @@
         <span class="material-icons">dashboard</span>
         Dashboard
     </a>
+    <a href="#" class="sidebar-link">
+        <span class="material-icons">campaign</span>
+        Announcements
+    </a>
     <div class="sidebar-divider"></div>
     <div class="sidebar-section-label">Classroom</div>
+    <a href="{{ route('teacher.classes.index') }}" class="sidebar-link {{ request()->routeIs('teacher.classes.*') ? 'active' : '' }}">
+        <span class="material-icons">class</span>
+        Classes
+    </a>
     <a href="{{ route('teacher.subjects.index') }}" class="sidebar-link {{ request()->routeIs('teacher.subjects.*') ? 'active' : '' }}">
         <span class="material-icons">menu_book</span>
         Subjects Assigned
@@ -158,10 +189,6 @@
     <a href="{{ route('teacher.performance.index') }}" class="sidebar-link {{ request()->routeIs('teacher.performance.*') ? 'active' : '' }}">
         <span class="material-icons">bar_chart</span>
         Performance Report
-    </a>
-    <a href="#" class="sidebar-link">
-        <span class="material-icons">campaign</span>
-        Announcements
     </a>
 </aside>
 
