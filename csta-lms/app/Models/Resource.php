@@ -9,6 +9,7 @@ class Resource extends Model
     protected $fillable = [
         'subject_id',
         'title',
+        'resource_type',
         'description',
         'file_path',
         'file_name',
