@@ -19,6 +19,10 @@ class ClassController extends Controller
             $query->where('name', 'like', "%$q%");
         }
 
+        if ($request->filled('status') && $request->status !== '') {
+            $query->where('status', (bool) $request->status);
+        }
+
         $classes  = $query->orderBy('name')->paginate(10)->withQueryString();
         $teachers = User::where('role', 'teacher')->where('status', true)->orderBy('full_name')->get();
         $students = User::where('role', 'student')->where('status', true)->orderBy('full_name')->get();
@@ -31,6 +35,7 @@ class ClassController extends Controller
         $request->validate([
             'name'       => 'required|string|max:255',
             'teacher_id' => 'nullable|exists:users,id',
+            'status'     => 'nullable|boolean',
             'students'   => 'nullable|array',
             'students.*' => 'exists:users,id',
         ]);
@@ -38,6 +43,7 @@ class ClassController extends Controller
         $class = SchoolClass::create([
             'name'       => $request->name,
             'teacher_id' => $request->teacher_id,
+            'status'     => $request->boolean('status', true),
         ]);
 
         if ($request->filled('students')) {
@@ -60,6 +66,7 @@ class ClassController extends Controller
         $request->validate([
             'name'       => 'required|string|max:255',
             'teacher_id' => 'nullable|exists:users,id',
+            'status'     => 'nullable|boolean',
             'students'   => 'nullable|array',
             'students.*' => 'exists:users,id',
         ]);
@@ -67,6 +74,7 @@ class ClassController extends Controller
         $class->update([
             'name'       => $request->name,
             'teacher_id' => $request->teacher_id,
+            'status'     => $request->boolean('status', true),
         ]);
 
         $class->students()->sync($request->students ?? []);
@@ -123,6 +131,7 @@ class ClassController extends Controller
             SchoolClass::create([
                 'name'       => trim($record['name']),
                 'teacher_id' => $teacher?->id,
+                'status'     => true,
             ]);
             $imported++;
         }
@@ -136,5 +145,15 @@ class ClassController extends Controller
         }
 
         return redirect()->route('admin.classes.index')->with('success', $msg);
+    }
+
+    public function toggleStatus(SchoolClass $class)
+    {
+        $class->update(['status' => !$class->status]);
+        $action = $class->status ? 'Activated' : 'Deactivated';
+
+        AuditLog::record("$action Class", "$action class: {$class->name}");
+
+        return redirect()->route('admin.classes.index')->with('success', "Class {$action} successfully.");
     }
 }
