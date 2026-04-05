@@ -35,11 +35,16 @@
                     </a>
                 @endif
             </div>
+            <select name="status" class="form-select" style="width:auto;font-size:14px;">
+                <option value="">All Status</option>
+                <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>Active</option>
+                <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>Inactive</option>
+            </select>
             <button type="submit" class="btn btn-primary rounded-pill px-3">
                 <span class="material-icons align-middle" style="font-size:16px;">filter_list</span>
                 Filter
             </button>
-            @if(request('search'))
+            @if(request()->hasAny(['search', 'status']))
                 <a href="{{ route('admin.classes.index') }}" class="btn btn-light rounded-pill px-3">Reset</a>
             @endif
         </form>
@@ -62,6 +67,7 @@
                     <th>Assigned Teacher</th>
                     <th>Students</th>
                     <th>Subjects</th>
+                    <th>Status</th>
                     <th style="text-align:right;">Actions</th>
                 </tr>
             </thead>
@@ -100,6 +106,13 @@
                             </span>
                         </td>
                         <td>
+                            @if($class->status)
+                                <span class="badge-active">Active</span>
+                            @else
+                                <span class="badge-inactive">Inactive</span>
+                            @endif
+                        </td>
+                        <td>
                             <div class="d-flex align-items-center justify-content-end gap-1">
                                 {{-- Edit --}}
                                 <button class="btn-icon" title="Edit"
@@ -107,9 +120,18 @@
                                     data-id="{{ $class->id }}"
                                     data-name="{{ $class->name }}"
                                     data-teacher_id="{{ $class->teacher_id }}"
+                                    data-status="{{ $class->status ? 1 : 0 }}"
                                     data-students="{{ $class->students->pluck('id')->toJson() }}">
                                     <span class="material-icons" style="color:#800020;">edit</span>
                                 </button>
+
+                                <form action="{{ route('admin.classes.toggleStatus', $class) }}" method="POST" class="d-inline">
+                                    @csrf @method('PATCH')
+                                    <button type="submit" class="btn-icon" title="{{ $class->status ? 'Deactivate' : 'Activate' }}"
+                                        onclick="return confirm('{{ $class->status ? 'Deactivate' : 'Activate' }} this class?')">
+                                        <span class="material-icons" style="color:{{ $class->status ? '#f9ab00' : '#34a853' }};">{{ $class->status ? 'block' : 'check_circle' }}</span>
+                                    </button>
+                                </form>
 
                                 {{-- Delete --}}
                                 <button class="btn-icon" title="Delete"
@@ -123,7 +145,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="text-center py-5">
+                        <td colspan="7" class="text-center py-5">
                             <span class="material-icons d-block mb-2" style="font-size:48px;color:#dadce0;">class</span>
                             <div style="color:#5f6368;font-size:15px;">No classes found.</div>
                             <button class="btn btn-primary rounded-pill mt-3 px-4" data-bs-toggle="modal" data-bs-target="#addModal">
@@ -142,7 +164,7 @@
                 <div style="font-size:13px;color:#5f6368;">
                     Showing {{ $classes->firstItem() }}–{{ $classes->lastItem() }} of {{ $classes->total() }} classes
                 </div>
-                {{ $classes->links() }}
+                {{ $classes->links('pagination::bootstrap-5') }}
             </div>
         </div>
     @endif
@@ -182,6 +204,12 @@
                                     </option>
                                 @endforeach
                             </select>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="status" value="1" id="add_status" checked>
+                                <label class="form-check-label" for="add_status">Active</label>
+                            </div>
                         </div>
                         <div class="col-12">
                             <label class="form-label">Assign Students</label>
@@ -254,6 +282,12 @@
                                     </option>
                                 @endforeach
                             </select>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="status" value="1" id="edit_status">
+                                <label class="form-check-label" for="edit_status">Active</label>
+                            </div>
                         </div>
                         <div class="col-12">
                             <label class="form-label">Assign Students</label>
@@ -371,6 +405,7 @@
         // Teacher select
         const teacherSel = document.getElementById('edit_teacher_id');
         teacherSel.value = btn.dataset.teacher_id || '';
+        document.getElementById('edit_status').checked = btn.dataset.status === '1';
 
         // Students checkboxes
         const enrolled = JSON.parse(btn.dataset.students || '[]');
