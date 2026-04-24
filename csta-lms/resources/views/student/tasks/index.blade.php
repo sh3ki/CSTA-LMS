@@ -34,8 +34,9 @@
             </select>
             <select name="status" class="form-select" style="width:auto;font-size:14px;min-width:150px;">
                 <option value="">All Status</option>
-                <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
-                <option value="past_due" {{ request('status') === 'past_due' ? 'selected' : '' }}>Past Due</option>
+                <option value="submitted_on_time" {{ request('status') === 'submitted_on_time' ? 'selected' : '' }}>Submitted On time</option>
+                <option value="submitted_late" {{ request('status') === 'submitted_late' ? 'selected' : '' }}>Submitted Late</option>
+                <option value="missing" {{ request('status') === 'missing' ? 'selected' : '' }}>Missing</option>
             </select>
             <button type="submit" class="btn btn-primary rounded-pill px-3">
                 <span class="material-icons align-middle" style="font-size:16px;">filter_list</span>
@@ -59,6 +60,7 @@
             <thead>
                 <tr>
                     <th>#</th>
+                    <th></th>
                     <th>Task</th>
                     <th>Subject</th>
                     <th>Due Date</th>
@@ -69,9 +71,19 @@
             </thead>
             <tbody>
                 @forelse ($tasks as $index => $task)
-                    @php $submission = $submissions->get($task->id); @endphp
+                    @php
+                        $submission = $submissions->get($task->id);
+                        $status = \App\Models\Submission::statusFor($submission, $task);
+                        $statusColors = \App\Models\Submission::statusColors($status);
+                        $urgentMissing = !$submission && $task->due_date->isFuture() && $task->due_date->lte(now()->copy()->addDay());
+                    @endphp
                     <tr>
                         <td style="color:#5f6368;width:48px;">{{ $tasks->firstItem() + $index }}</td>
+                        <td style="width:30px;">
+                            @if($urgentMissing)
+                                <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ea4335;"></span>
+                            @endif
+                        </td>
                         <td>
                             <div class="d-flex align-items-center gap-2">
                                 <div style="width:36px;height:36px;background:linear-gradient(135deg,{{ $task->due_date->isPast() ? '#ea4335,#f28b82' : '#4a6cf7,#8fa8ff' }});border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
@@ -97,18 +109,14 @@
                             </span>
                         </td>
                         <td>
-                            <span style="color:{{ $task->due_date->isPast() ? '#ea4335' : '#34a853' }};font-size:13px;font-weight:500;">
+                            <span style="color:{{ $statusColors['text'] }};font-size:13px;font-weight:500;">
                                 {{ $task->due_date->format('M d, Y h:i A') }}
                             </span>
                         </td>
                         <td>
-                            @if($submission)
-                                <span class="badge rounded-pill" style="background:#e6f4ea;color:#34a853;font-size:12px;">Submitted</span>
-                            @elseif($task->due_date->isPast())
-                                <span class="badge rounded-pill" style="background:#fce8e6;color:#ea4335;font-size:12px;">Past Due</span>
-                            @else
-                                <span class="badge rounded-pill" style="background:#fef7e0;color:#f9ab00;font-size:12px;">Pending</span>
-                            @endif
+                            <span class="badge rounded-pill" style="background:{{ $statusColors['background'] }};color:{{ $statusColors['text'] }};font-size:12px;">
+                                {{ \App\Models\Submission::statusLabel($status) }}
+                            </span>
                         </td>
                         <td>
                             @if($submission && $submission->grade !== null)
@@ -134,7 +142,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="text-center py-5">
+                        <td colspan="8" class="text-center py-5">
                             <span class="material-icons d-block mb-2" style="font-size:48px;color:#dadce0;">assignment</span>
                             <div style="color:#5f6368;font-size:15px;">No assigned tasks yet.</div>
                         </td>
