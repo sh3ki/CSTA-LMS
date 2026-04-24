@@ -176,7 +176,7 @@
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Course Code</label>
+                            <label class="form-label">Subject Code</label>
                             <input type="text" name="course_code" class="form-control" placeholder="e.g. CS101">
                         </div>
                         <div class="col-md-6">
