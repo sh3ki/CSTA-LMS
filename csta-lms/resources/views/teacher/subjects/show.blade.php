@@ -12,15 +12,19 @@
     $students = $subject->schoolClass ? $subject->schoolClass->students : collect();
     // Merge resources + tasks into a single stream sorted by latest first
     $stream = collect();
-    foreach ($subject->resources as $r) {
-        $stream->push((object)[
-            'type' => 'resource', 'item' => $r, 'date' => $r->created_at,
-        ]);
+    if (($streamType ?? 'all') !== 'tasks') {
+        foreach ($subject->resources as $r) {
+            $stream->push((object)[
+                'type' => 'resource', 'item' => $r, 'date' => $r->created_at,
+            ]);
+        }
     }
-    foreach ($subject->tasks as $t) {
-        $stream->push((object)[
-            'type' => 'task', 'item' => $t, 'date' => $t->created_at,
-        ]);
+    if (($streamType ?? 'all') !== 'resources') {
+        foreach ($subject->tasks as $t) {
+            $stream->push((object)[
+                'type' => 'task', 'item' => $t, 'date' => $t->created_at,
+            ]);
+        }
     }
     $stream = $stream->sortByDesc('date');
 @endphp
@@ -79,6 +83,18 @@
 <div class="tab-content" id="subjectTabContent">
     <!-- Stream Tab -->
     <div class="tab-pane fade show active" id="stream" role="tabpanel">
+          <div class="d-flex align-items-center gap-2 flex-wrap mb-3">
+                <a href="{{ route('teacher.subjects.show', ['subject' => $subject->id, 'stream_type' => 'all']) }}"
+                    class="btn btn-sm rounded-pill px-3 {{ ($streamType ?? 'all') === 'all' ? '' : 'btn-light' }}"
+                    style="{{ ($streamType ?? 'all') === 'all' ? 'background:#800020;color:#fff;' : '' }}">All</a>
+                <a href="{{ route('teacher.subjects.show', ['subject' => $subject->id, 'stream_type' => 'resources']) }}"
+                    class="btn btn-sm rounded-pill px-3 {{ ($streamType ?? 'all') === 'resources' ? '' : 'btn-light' }}"
+                    style="{{ ($streamType ?? 'all') === 'resources' ? 'background:#800020;color:#fff;' : '' }}">Resources Only</a>
+                <a href="{{ route('teacher.subjects.show', ['subject' => $subject->id, 'stream_type' => 'tasks']) }}"
+                    class="btn btn-sm rounded-pill px-3 {{ ($streamType ?? 'all') === 'tasks' ? '' : 'btn-light' }}"
+                    style="{{ ($streamType ?? 'all') === 'tasks' ? 'background:#800020;color:#fff;' : '' }}">Tasks Only</a>
+          </div>
+
         <!-- Action Buttons -->
         <div class="d-flex gap-2 mb-4 flex-wrap">
             <button class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#uploadResourceModal">
@@ -319,7 +335,7 @@
                     <div class="mb-0">
                         <label class="form-label fw-semibold" style="font-size:13px;">File <span class="text-danger">*</span></label>
                         <input type="file" name="file" class="form-control" required>
-                        <div class="form-text" style="font-size:12px;">Max 20MB. Supports PDF, DOC, PPT, images, videos, etc.</div>
+                        <div class="form-text" style="font-size:12px;">Max 500MB. Supports PDF, DOC, PPT, images, videos, etc.</div>
                     </div>
                 </div>
                 <div class="modal-footer" style="border-top:1px solid #e8eaed;padding:16px 24px;">
@@ -379,7 +395,7 @@
                         <div class="col-12">
                             <label class="form-label fw-semibold" style="font-size:13px;">Attachment (Optional)</label>
                             <input type="file" name="file" class="form-control">
-                            <div class="form-text" style="font-size:12px;">Max 20MB. Attach reference materials or instructions.</div>
+                            <div class="form-text" style="font-size:12px;">Max 500MB. Attach reference materials or instructions.</div>
                         </div>
                     </div>
                 </div>
