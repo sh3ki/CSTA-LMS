@@ -55,10 +55,22 @@ class TaskController extends Controller
         }
 
         if ($request->filled('status')) {
-            if ($request->status === 'pending') {
-                $query->where('due_date', '>', now());
-            } elseif ($request->status === 'past_due') {
-                $query->where('due_date', '<=', now());
+            if ($request->status === Submission::STATUS_ON_TIME) {
+                $query->whereHas('submissions', function ($submissionQuery) use ($student) {
+                    $submissionQuery->where('student_id', $student->id)
+                        ->whereNotNull('submitted_at')
+                        ->whereColumn('submitted_at', '<=', 'tasks.due_date');
+                });
+            } elseif ($request->status === Submission::STATUS_LATE) {
+                $query->whereHas('submissions', function ($submissionQuery) use ($student) {
+                    $submissionQuery->where('student_id', $student->id)
+                        ->whereNotNull('submitted_at')
+                        ->whereColumn('submitted_at', '>', 'tasks.due_date');
+                });
+            } elseif ($request->status === Submission::STATUS_MISSING) {
+                $query->whereDoesntHave('submissions', function ($submissionQuery) use ($student) {
+                    $submissionQuery->where('student_id', $student->id);
+                });
             }
         }
 
@@ -107,7 +119,7 @@ class TaskController extends Controller
         }
 
         $request->validate([
-            'file' => 'required|file|max:20480',
+            'file' => 'required|file|max:512000',
             'submission_note' => 'nullable|string|max:2000',
         ]);
 
