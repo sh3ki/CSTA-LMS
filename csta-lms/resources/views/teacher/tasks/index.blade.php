@@ -273,7 +273,7 @@
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Task Type <span class="text-danger">*</span></label>
-                            <select name="task_type" class="form-select" required>
+                            <select name="task_type" id="create_task_type" class="form-select" required>
                                 @foreach(['Activity', 'Quiz', 'Assignment', 'Others'] as $type)
                                     <option value="{{ $type }}" {{ old('task_type', 'Assignment') === $type ? 'selected' : '' }}>{{ $type }}</option>
                                 @endforeach
@@ -305,13 +305,30 @@
                         </div>
                         <div class="col-12">
                             <label class="form-label">Description</label>
-                            <textarea name="description" class="form-control" rows="3"
+                            <textarea name="description" id="create_description" class="form-control" rows="3"
                                 placeholder="Task instructions and details...">{{ old('description') }}</textarea>
+                        </div>
+                        <div class="col-12" id="quizBuilderSection" style="display:none;">
+                            <div class="p-3 rounded-3" style="border:1px solid #e8eaed;background:#f8f9fa;">
+                                <div class="d-flex align-items-center justify-content-between mb-3">
+                                    <h6 style="margin:0;font-family:'Google Sans',Roboto,sans-serif;font-size:14px;font-weight:600;color:#202124;">Quiz Builder</h6>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3" id="addQuizItemBtn">
+                                        <span class="material-icons align-middle me-1" style="font-size:14px;">add</span>
+                                        Add Quiz Item
+                                    </button>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" style="font-size:13px;">Google Form Link <span class="text-muted">(optional)</span></label>
+                                    <input type="url" name="google_form_link" class="form-control" placeholder="https://forms.gle/..." value="{{ old('google_form_link') }}">
+                                </div>
+                                <div id="quizItemsContainer" class="d-flex flex-column gap-3"></div>
+                                <div class="form-text mt-2">You can mix Enumeration, Identification, and Multiple Choice items.</div>
+                            </div>
                         </div>
                         <div class="col-12">
                             <label class="form-label">Attachment <span class="text-muted">(optional)</span></label>
                             <input type="file" name="file" class="form-control">
-                            <div class="form-text">Max file size: 20MB</div>
+                            <div class="form-text">Max file size: 500MB</div>
                         </div>
                     </div>
                 </div>
@@ -436,6 +453,107 @@
 
 @push('scripts')
 <script>
+    const createTaskType = document.getElementById('create_task_type');
+    const quizBuilderSection = document.getElementById('quizBuilderSection');
+    const quizItemsContainer = document.getElementById('quizItemsContainer');
+    const addQuizItemBtn = document.getElementById('addQuizItemBtn');
+
+    const quizItemTemplate = (index) => `
+        <div class="quiz-item card" data-quiz-item-index="${index}" style="border:1px solid #e8eaed;">
+            <div class="card-body p-3">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <strong style="font-size:13px;">Item #${index + 1}</strong>
+                    <button type="button" class="btn btn-sm btn-light remove-quiz-item">Remove</button>
+                </div>
+                <div class="row g-2">
+                    <div class="col-md-4">
+                        <label class="form-label" style="font-size:12px;">Quiz Type</label>
+                        <select name="quiz_items[${index}][type]" class="form-select quiz-item-type" required>
+                            <option value="enumeration">Enumeration</option>
+                            <option value="identification">Identification</option>
+                            <option value="multiple_choice">Multiple Choice</option>
+                        </select>
+                    </div>
+                    <div class="col-md-8">
+                        <label class="form-label" style="font-size:12px;">Question</label>
+                        <input type="text" name="quiz_items[${index}][question]" class="form-control" placeholder="Enter question..." required>
+                    </div>
+                    <div class="col-12 quiz-choices" style="display:none;">
+                        <label class="form-label" style="font-size:12px;">Choices (for Multiple Choice)</label>
+                        <div class="row g-2">
+                            ${['A', 'B', 'C', 'D'].map((option) => `
+                                <div class="col-md-6">
+                                    <input type="text" name="quiz_items[${index}][choices][${option}]" class="form-control" placeholder="${option}. Choice">
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    const refreshQuizItems = () => {
+        [...quizItemsContainer.querySelectorAll('.quiz-item')].forEach((item, idx) => {
+            item.dataset.quizItemIndex = idx;
+            item.querySelector('strong').textContent = `Item #${idx + 1}`;
+
+            item.querySelectorAll('input, select').forEach((field) => {
+                field.name = field.name.replace(/quiz_items\[\d+\]/, `quiz_items[${idx}]`);
+            });
+        });
+    };
+
+    const attachQuizItemEvents = (item) => {
+        const typeSelect = item.querySelector('.quiz-item-type');
+        const choicesBlock = item.querySelector('.quiz-choices');
+
+        const toggleChoices = () => {
+            const isMC = typeSelect.value === 'multiple_choice';
+            choicesBlock.style.display = isMC ? 'block' : 'none';
+            choicesBlock.querySelectorAll('input').forEach((input) => {
+                input.required = isMC;
+            });
+        };
+
+        typeSelect.addEventListener('change', toggleChoices);
+        toggleChoices();
+
+        item.querySelector('.remove-quiz-item').addEventListener('click', () => {
+            item.remove();
+            refreshQuizItems();
+        });
+    };
+
+    const addQuizItem = () => {
+        const index = quizItemsContainer.querySelectorAll('.quiz-item').length;
+        const temp = document.createElement('div');
+        temp.innerHTML = quizItemTemplate(index).trim();
+        const item = temp.firstChild;
+        quizItemsContainer.appendChild(item);
+        attachQuizItemEvents(item);
+    };
+
+    const syncQuizBuilderVisibility = () => {
+        const isQuiz = createTaskType.value === 'Quiz';
+        quizBuilderSection.style.display = isQuiz ? 'block' : 'none';
+        if (isQuiz && quizItemsContainer.querySelectorAll('.quiz-item').length === 0) {
+            addQuizItem();
+        }
+
+        if (!isQuiz) {
+            quizItemsContainer.innerHTML = '';
+        }
+    };
+
+    if (addQuizItemBtn) {
+        addQuizItemBtn.addEventListener('click', addQuizItem);
+    }
+    if (createTaskType) {
+        createTaskType.addEventListener('change', syncQuizBuilderVisibility);
+        syncQuizBuilderVisibility();
+    }
+
     // ── Edit Modal
     document.getElementById('editModal').addEventListener('show.bs.modal', event => {
         const btn = event.relatedTarget;
