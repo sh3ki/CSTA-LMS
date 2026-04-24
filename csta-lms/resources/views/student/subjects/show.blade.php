@@ -53,6 +53,9 @@
     <li class="nav-item" role="presentation">
         <button class="nav-link active" id="stream-tab" data-bs-toggle="tab" data-bs-target="#stream" type="button" role="tab" style="font-family:'Google Sans',Roboto,sans-serif;font-weight:600;font-size:14px;color:#f9ab00;">
             <span class="material-icons align-middle me-1" style="font-size:16px;">dynamic_feed</span> Stream
+            @if(($pendingTaskCount ?? 0) > 0)
+                <span class="badge rounded-pill ms-1" style="background:#ea4335;color:#fff;font-size:11px;">{{ $pendingTaskCount }}</span>
+            @endif
         </button>
     </li>
     <li class="nav-item" role="presentation">
@@ -68,18 +71,34 @@
         @php
             // Merge resources + tasks into a single stream sorted by latest first
             $stream = collect();
-            foreach ($subject->resources as $r) {
-                $stream->push((object)[
-                    'type' => 'resource', 'item' => $r, 'date' => $r->created_at,
-                ]);
+            if (($streamType ?? 'all') !== 'tasks') {
+                foreach ($subject->resources as $r) {
+                    $stream->push((object)[
+                        'type' => 'resource', 'item' => $r, 'date' => $r->created_at,
+                    ]);
+                }
             }
-            foreach ($subject->tasks as $t) {
-                $stream->push((object)[
-                    'type' => 'task', 'item' => $t, 'date' => $t->created_at,
-                ]);
+            if (($streamType ?? 'all') !== 'resources') {
+                foreach ($subject->tasks as $t) {
+                    $stream->push((object)[
+                        'type' => 'task', 'item' => $t, 'date' => $t->created_at,
+                    ]);
+                }
             }
             $stream = $stream->sortByDesc('date');
         @endphp
+
+        <div class="d-flex align-items-center gap-2 flex-wrap mb-3">
+            <a href="{{ route('student.subjects.show', ['subject' => $subject->id, 'stream_type' => 'all']) }}"
+               class="btn btn-sm rounded-pill px-3 {{ ($streamType ?? 'all') === 'all' ? '' : 'btn-light' }}"
+               style="{{ ($streamType ?? 'all') === 'all' ? 'background:#f9ab00;color:#fff;' : '' }}">All</a>
+            <a href="{{ route('student.subjects.show', ['subject' => $subject->id, 'stream_type' => 'resources']) }}"
+               class="btn btn-sm rounded-pill px-3 {{ ($streamType ?? 'all') === 'resources' ? '' : 'btn-light' }}"
+               style="{{ ($streamType ?? 'all') === 'resources' ? 'background:#f9ab00;color:#fff;' : '' }}">Resources Only</a>
+            <a href="{{ route('student.subjects.show', ['subject' => $subject->id, 'stream_type' => 'tasks']) }}"
+               class="btn btn-sm rounded-pill px-3 {{ ($streamType ?? 'all') === 'tasks' ? '' : 'btn-light' }}"
+               style="{{ ($streamType ?? 'all') === 'tasks' ? 'background:#f9ab00;color:#fff;' : '' }}">Tasks Only</a>
+        </div>
 
         <!-- Stream Items -->
         @forelse($stream as $entry)
@@ -133,6 +152,15 @@
                 </div>
             @else
                 @php $t = $entry->item; @endphp
+                @php
+                    $streamSubmission = $submissions->get($t->id);
+                    $streamStatus = \App\Models\Submission::statusFor($streamSubmission, $t);
+                    $streamStatusColors = \App\Models\Submission::statusColors($streamStatus);
+                    $streamGoogleFormUrl = null;
+                    if (preg_match('/Google Form:\s*(https?:\/\/\S+)/i', (string) $t->description, $matches)) {
+                        $streamGoogleFormUrl = $matches[1];
+                    }
+                @endphp
                 <div class="card mb-3 stream-card">
                     <div class="card-body p-3">
                         <div class="d-flex align-items-start gap-3">
@@ -156,7 +184,7 @@
                                     <div class="d-flex align-items-center gap-3 flex-wrap">
                                         <span style="font-size:12px;color:#5f6368;">
                                             <span class="material-icons align-middle me-1" style="font-size:14px;">event</span>
-                                            Due: <strong style="color:{{ $t->due_date && $t->due_date->isPast() ? '#ea4335' : '#202124' }};">
+                                            Due: <strong style="color:{{ $streamStatusColors['text'] }};">
                                                 {{ $t->due_date ? $t->due_date->format('M d, Y g:i A') : 'No due date' }}
                                             </strong>
                                         </span>
@@ -176,11 +204,15 @@
                                             <span class="material-icons align-middle me-1" style="font-size:14px;">assignment</span>
                                             View Task
                                         </a>
-                                        @if(isset($submissions[$t->id]))
-                                            <span class="badge bg-success ms-2">Submitted</span>
-                                        @else
-                                            <span class="badge bg-warning ms-2">Pending</span>
+                                        @if($streamGoogleFormUrl)
+                                            <a href="{{ $streamGoogleFormUrl }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary rounded-pill px-3 ms-1" style="font-size:12px;">
+                                                <span class="material-icons align-middle me-1" style="font-size:14px;">open_in_new</span>
+                                                Open Form
+                                            </a>
                                         @endif
+                                        <span class="badge rounded-pill ms-2" style="background:{{ $streamStatusColors['background'] }};color:{{ $streamStatusColors['text'] }};">
+                                            {{ \App\Models\Submission::statusLabel($streamStatus) }}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
