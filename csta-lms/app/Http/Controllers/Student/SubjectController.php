@@ -21,6 +21,11 @@ class SubjectController extends Controller
         })->where('status', true)->pluck('id');
 
         $query = Subject::with(['schoolClass.teacher', 'resources', 'tasks'])
+            ->withCount(['tasks as pending_tasks_count' => function ($taskQuery) use ($student) {
+                $taskQuery->whereDoesntHave('submissions', function ($submissionQuery) use ($student) {
+                    $submissionQuery->where('student_id', $student->id);
+                });
+            }])
             ->whereIn('class_id', $classIds)
             ->where('status', true);
 
@@ -42,9 +47,9 @@ class SubjectController extends Controller
         return view('student.subjects.index', compact('subjects', 'classes'));
     }
 
-    public function show(Subject $subject)
+    public function show(Request $request, Subject $subject)
     {
-        $student = request()->user();
+        $student = $request->user();
 
         $enrolled = SchoolClass::whereHas('students', function ($query) use ($student) {
             $query->where('users.id', $student->id);
@@ -65,7 +70,16 @@ class SubjectController extends Controller
 
         $students = $subject->schoolClass ? $subject->schoolClass->students : collect();
 
-        return view('student.subjects.show', compact('subject', 'submissions', 'students'));
+        $streamType = $request->input('stream_type', 'all');
+        if (!in_array($streamType, ['all', 'resources', 'tasks'], true)) {
+            $streamType = 'all';
+        }
+
+        $pendingTaskCount = $subject->tasks->filter(function ($task) use ($submissions) {
+            return !isset($submissions[$task->id]);
+        })->count();
+
+        return view('student.subjects.show', compact('subject', 'submissions', 'students', 'streamType', 'pendingTaskCount'));
     }
 
     public function joinByCode(Request $request)
