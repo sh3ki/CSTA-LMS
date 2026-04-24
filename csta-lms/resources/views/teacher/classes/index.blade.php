@@ -143,15 +143,20 @@
                         <input type="text" name="name" class="form-control" required>
                     </div>
                     <label class="form-label">Assign Students</label>
-                    <div class="row g-2" style="max-height:260px;overflow:auto;">
-                        @foreach($students as $student)
+                    <input type="text" class="form-control mb-2 teacher-student-filter-input" data-target="teacherAddStudentsList" placeholder="Search students for checkbox selection...">
+                    <div id="teacherAddStudentsList" class="row g-2" style="max-height:260px;overflow:auto;">
+                        @forelse($students as $student)
                             <div class="col-md-6">
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" name="students[]" value="{{ $student->id }}" id="add_student_{{ $student->id }}">
                                     <label class="form-check-label" for="add_student_{{ $student->id }}">{{ $student->full_name }} ({{ $student->id_number }})</label>
                                 </div>
                             </div>
-                        @endforeach
+                        @empty
+                            <div class="col-12">
+                                <div style="font-size:13px;color:#5f6368;">No students available from your currently assigned classes.</div>
+                            </div>
+                        @endforelse
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -175,15 +180,20 @@
                         <input type="text" name="name" id="edit_name" class="form-control" required>
                     </div>
                     <label class="form-label">Assign Students</label>
-                    <div class="row g-2" style="max-height:260px;overflow:auto;">
-                        @foreach($students as $student)
+                    <input type="text" class="form-control mb-2 teacher-student-filter-input" data-target="teacherEditStudentsList" placeholder="Search students for checkbox selection...">
+                    <div id="teacherEditStudentsList" class="row g-2" style="max-height:260px;overflow:auto;">
+                        @forelse($students as $student)
                             <div class="col-md-6">
                                 <div class="form-check">
                                     <input class="form-check-input edit-student-check" type="checkbox" name="students[]" value="{{ $student->id }}" id="edit_student_{{ $student->id }}">
                                     <label class="form-check-label" for="edit_student_{{ $student->id }}">{{ $student->full_name }} ({{ $student->id_number }})</label>
                                 </div>
                             </div>
-                        @endforeach
+                        @empty
+                            <div class="col-12">
+                                <div style="font-size:13px;color:#5f6368;">No students available from your currently assigned classes.</div>
+                            </div>
+                        @endforelse
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -265,6 +275,20 @@ document.getElementById('classDetailsModal').addEventListener('show.bs.modal', f
 
     const subjectsBase = '{{ route('teacher.subjects.index') }}';
     document.getElementById('classDetailsViewSubjectsBtn').href = `${subjectsBase}?search=&class_id=${classId}`;
+});
+
+document.querySelectorAll('.teacher-student-filter-input').forEach((input) => {
+    input.addEventListener('input', () => {
+        const needle = input.value.trim().toLowerCase();
+        const targetId = input.dataset.target;
+        const list = document.getElementById(targetId);
+        if (!list) return;
+
+        list.querySelectorAll('.form-check').forEach((check) => {
+            const text = check.textContent.toLowerCase();
+            check.closest('.col-md-6, .col-12')?.classList.toggle('d-none', needle !== '' && !text.includes(needle));
+        });
+    });
 });
 </script>
 @endpush
