@@ -116,11 +116,13 @@
                         </td>
                         <td><code style="background:#f1f3f4;padding:3px 8px;border-radius:6px;font-size:13px;">{{ $student->id_number }}</code></td>
                         <td>
-                            @if($submission)
-                                <span class="badge rounded-pill" style="background:#e6f4ea;color:#34a853;font-size:12px;padding:4px 12px;">Submitted</span>
-                            @else
-                                <span class="badge rounded-pill" style="background:#fce8e6;color:#ea4335;font-size:12px;padding:4px 12px;">Not Submitted</span>
-                            @endif
+                            @php
+                                $submissionStatus = \App\Models\Submission::statusFor($submission, $task);
+                                $statusColors = \App\Models\Submission::statusColors($submissionStatus);
+                            @endphp
+                            <span class="badge rounded-pill" style="background:{{ $statusColors['background'] }};color:{{ $statusColors['text'] }};font-size:12px;padding:4px 12px;">
+                                {{ \App\Models\Submission::statusLabel($submissionStatus) }}
+                            </span>
                         </td>
                         <td>
                             @if($submission && $submission->file_path)
