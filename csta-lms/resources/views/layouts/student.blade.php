@@ -99,6 +99,21 @@
     @stack('styles')
 </head>
 <body>
+@php
+    $urgentTaskCount = 0;
+    if (auth()->check()) {
+        $studentId = auth()->id();
+        $urgentTaskCount = \App\Models\Task::whereHas('subject.schoolClass.students', function ($query) use ($studentId) {
+                $query->where('users.id', $studentId);
+            })
+            ->where('due_date', '>', now())
+            ->where('due_date', '<=', now()->copy()->addDay())
+            ->whereDoesntHave('submissions', function ($submissionQuery) use ($studentId) {
+                $submissionQuery->where('student_id', $studentId);
+            })
+            ->count();
+    }
+@endphp
 
 <header class="app-navbar">
     <button class="hamburger-btn me-2" id="sidebarToggle">
@@ -177,6 +192,9 @@
     <a href="{{ route('student.tasks.index') }}" class="sidebar-link {{ request()->routeIs('student.tasks.*') ? 'active' : '' }}">
         <span class="material-icons">assignment_turned_in</span>
         Tasks &amp; Activities
+        @if($urgentTaskCount > 0)
+            <span class="badge rounded-pill ms-auto" style="background:#ea4335;color:#fff;font-size:11px;">{{ $urgentTaskCount }}</span>
+        @endif
     </a>
 </aside>
 
