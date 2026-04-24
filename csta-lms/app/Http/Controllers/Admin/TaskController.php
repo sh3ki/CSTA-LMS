@@ -46,7 +46,7 @@ class TaskController extends Controller
             'description' => 'nullable|string',
             'due_date' => 'required|date',
             'total_points' => 'required|integer|min:1|max:1000',
-            'file' => 'nullable|file|max:20480',
+            'file' => 'nullable|file|max:512000',
         ]);
 
         $data = [
@@ -81,7 +81,7 @@ class TaskController extends Controller
             'description' => 'nullable|string',
             'due_date' => 'required|date',
             'total_points' => 'required|integer|min:1|max:1000',
-            'file' => 'nullable|file|max:20480',
+            'file' => 'nullable|file|max:512000',
         ]);
 
         $data = [
