@@ -213,7 +213,8 @@
                         </div>
                         <div class="col-12">
                             <label class="form-label">Assign Students</label>
-                            <div style="max-height:200px;overflow-y:auto;border:1.5px solid #dadce0;border-radius:8px;padding:12px;">
+                            <input type="text" class="form-control mb-2 student-filter-input" data-target="addStudentsList" placeholder="Search students for checkbox selection...">
+                            <div id="addStudentsList" style="max-height:200px;overflow-y:auto;border:1.5px solid #dadce0;border-radius:8px;padding:12px;">
                                 @if($students->isEmpty())
                                     <p style="font-size:13px;color:#5f6368;margin:0;">No students available. Add students first.</p>
                                 @else
@@ -291,6 +292,7 @@
                         </div>
                         <div class="col-12">
                             <label class="form-label">Assign Students</label>
+                            <input type="text" class="form-control mb-2 student-filter-input" data-target="editStudentsList" placeholder="Search students for checkbox selection...">
                             <div id="editStudentsList" style="max-height:200px;overflow-y:auto;border:1.5px solid #dadce0;border-radius:8px;padding:12px;">
                                 @if($students->isEmpty())
                                     <p style="font-size:13px;color:#5f6368;margin:0;">No students available.</p>
@@ -425,5 +427,19 @@
     @if ($errors->any())
         new bootstrap.Modal(document.getElementById('addModal')).show();
     @endif
+
+    document.querySelectorAll('.student-filter-input').forEach((input) => {
+        input.addEventListener('input', () => {
+            const needle = input.value.trim().toLowerCase();
+            const targetId = input.dataset.target;
+            const list = document.getElementById(targetId);
+            if (!list) return;
+
+            list.querySelectorAll('.form-check').forEach((check) => {
+                const text = check.textContent.toLowerCase();
+                check.closest('.col')?.classList.toggle('d-none', needle !== '' && !text.includes(needle));
+            });
+        });
+    });
 </script>
 @endpush
