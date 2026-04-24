@@ -15,6 +15,54 @@ use Illuminate\Support\Facades\Storage;
 
 class TaskController extends Controller
 {
+    private function buildQuizDescription(?string $baseDescription, array $quizItems, ?string $googleFormLink): string
+    {
+        $lines = [];
+        $description = trim((string) $baseDescription);
+
+        if ($description !== '') {
+            $lines[] = $description;
+            $lines[] = '';
+        }
+
+        if (!empty($quizItems)) {
+            $lines[] = 'Quiz Items:';
+            foreach ($quizItems as $index => $item) {
+                $question = trim((string) ($item['question'] ?? ''));
+                if ($question === '') {
+                    continue;
+                }
+
+                $type = strtolower((string) ($item['type'] ?? ''));
+                $label = match ($type) {
+                    'enumeration' => 'Enumeration',
+                    'identification' => 'Identification',
+                    'multiple_choice' => 'Multiple Choice',
+                    default => 'Question',
+                };
+
+                $lines[] = ($index + 1) . ". [{$label}] {$question}";
+
+                if ($type === 'multiple_choice') {
+                    $choices = $item['choices'] ?? [];
+                    foreach (['A', 'B', 'C', 'D'] as $option) {
+                        $value = trim((string) ($choices[$option] ?? ''));
+                        if ($value !== '') {
+                            $lines[] = "   {$option}. {$value}";
+                        }
+                    }
+                }
+            }
+            $lines[] = '';
+        }
+
+        if ($googleFormLink) {
+            $lines[] = 'Google Form: ' . trim($googleFormLink);
+        }
+
+        return trim(implode("\n", $lines));
+    }
+
     /**
      * Check if the given subject belongs to the authenticated teacher via DB query.
      */
@@ -76,7 +124,12 @@ class TaskController extends Controller
             'description'  => 'nullable|string',
             'due_date'     => 'required|date|after:now',
             'total_points' => 'required|integer|min:1|max:1000',
-            'file'         => 'nullable|file|max:20480',
+            'file'         => 'nullable|file|max:512000',
+            'quiz_items'   => 'nullable|array',
+            'quiz_items.*.type' => 'nullable|in:enumeration,identification,multiple_choice',
+            'quiz_items.*.question' => 'nullable|string|max:2000',
+            'quiz_items.*.choices' => 'nullable|array',
+            'google_form_link' => 'nullable|url|max:2048',
         ]);
 
         if (!$this->ownsSubject($request->subject_id)) {
@@ -92,6 +145,21 @@ class TaskController extends Controller
             'total_points' => $request->total_points,
             'created_by'   => $request->user()->id,
         ];
+
+        if ($request->task_type === 'Quiz') {
+            $quizItems = collect($request->input('quiz_items', []))
+                ->filter(function ($item) {
+                    return !empty($item['type']) && !empty(trim((string) ($item['question'] ?? '')));
+                })
+                ->values()
+                ->all();
+
+            $data['description'] = $this->buildQuizDescription(
+                $request->description,
+                $quizItems,
+                $request->google_form_link
+            );
+        }
 
         if ($request->hasFile('file')) {
             $file = $request->file('file');
@@ -161,7 +229,7 @@ class TaskController extends Controller
             'description'  => 'nullable|string',
             'due_date'     => 'required|date',
             'total_points' => 'required|integer|min:1|max:1000',
-            'file'         => 'nullable|file|max:20480',
+            'file'         => 'nullable|file|max:512000',
         ]);
 
         if (!$this->ownsSubject($request->subject_id)) {
