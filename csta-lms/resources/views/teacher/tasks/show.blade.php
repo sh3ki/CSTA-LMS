@@ -165,14 +165,13 @@
                         <td>
                             <div class="d-flex align-items-center justify-content-end gap-1">
                                 @if($submission)
-                                    <form action="{{ route('teacher.submissions.toggleResubmit', $submission) }}" method="POST" class="d-inline"
-                                          onsubmit="return confirm('Are you sure you want to {{ $submission->allow_resubmit ? 'disable' : 'enable' }} resubmission for {{ $student->full_name }}?');">
-                                        @csrf
-                                        @method('PATCH')
-                                        <button type="submit" class="btn-icon" title="{{ $submission->allow_resubmit ? 'Disable Resubmit' : 'Allow Resubmit' }}">
-                                            <span class="material-icons" style="color:{{ $submission->allow_resubmit ? '#34a853' : '#5f6368' }};">restart_alt</span>
-                                        </button>
-                                    </form>
+                                    <button type="button" class="btn-icon" title="{{ $submission->allow_resubmit ? 'Disable Resubmit' : 'Allow Resubmit' }}"
+                                        data-bs-toggle="modal" data-bs-target="#toggleResubmitModal"
+                                        data-action="{{ route('teacher.submissions.toggleResubmit', $submission) }}"
+                                        data-student_name="{{ $student->full_name }}"
+                                        data-next_state="{{ $submission->allow_resubmit ? 'disable' : 'enable' }}">
+                                        <span class="material-icons" style="color:{{ $submission->allow_resubmit ? '#34a853' : '#5f6368' }};">restart_alt</span>
+                                    </button>
                                     @php
                                         $historyPayload = $submission->histories->map(function ($history) {
                                             return [
@@ -230,6 +229,28 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Close</button>
             </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="toggleResubmitModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:420px;">
+        <div class="modal-content" style="border-radius:16px;border:none;box-shadow:0 8px 32px rgba(0,0,0,.15);">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Resubmission Change</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="toggleResubmitForm" method="POST">
+                @csrf
+                @method('PATCH')
+                <div class="modal-body">
+                    <p id="toggleResubmitMessage" style="font-size:14px;color:#5f6368;margin:0;"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4">Confirm</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -337,6 +358,17 @@
                 </div>
             `;
         }).join('');
+    });
+
+    document.getElementById('toggleResubmitModal').addEventListener('show.bs.modal', event => {
+        const btn = event.relatedTarget;
+        const action = btn.dataset.action;
+        const studentName = btn.dataset.student_name;
+        const nextState = btn.dataset.next_state;
+
+        document.getElementById('toggleResubmitForm').action = action;
+        document.getElementById('toggleResubmitMessage').textContent =
+            `Are you sure you want to ${nextState} resubmission for ${studentName}?`;
     });
 </script>
 @endpush
