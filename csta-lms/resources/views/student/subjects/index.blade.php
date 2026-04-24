@@ -65,7 +65,12 @@
         @php $color = $cardColors[$index % count($cardColors)]; @endphp
         <div class="col-sm-6 col-lg-4 col-xl-3">
             <a href="{{ route('student.subjects.show', $subject) }}" class="subject-card" style="text-decoration:none;display:block;">
-                <div class="card h-100" style="border:none;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.12);transition:box-shadow .2s,transform .15s;">
+                <div class="card h-100" style="position:relative;border:none;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.12);transition:box-shadow .2s,transform .15s;">
+                    @if(($subject->pending_tasks_count ?? 0) > 0)
+                        <span style="position:absolute;top:10px;right:10px;z-index:2;background:#ea4335;color:#fff;border-radius:999px;min-width:24px;height:24px;padding:0 8px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;">
+                            {{ $subject->pending_tasks_count }}
+                        </span>
+                    @endif
                     <div style="background:linear-gradient(135deg,{{ $color[0] }},{{ $color[1] }});padding:20px 20px 16px;position:relative;min-height:120px;">
                         <div style="position:absolute;top:16px;right:16px;opacity:.15;">
                             <span class="material-icons" style="font-size:64px;color:#fff;">menu_book</span>
