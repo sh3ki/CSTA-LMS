@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Storage;
 
 class StudentController extends Controller
 {
+    private const COURSE_OPTIONS = ['BSIT', 'BSED', 'BSHM', 'BSTM'];
+
     public function index(Request $request)
     {
         $query = User::where('role', 'student');
@@ -29,9 +31,26 @@ class StudentController extends Controller
             $query->where('status', $request->status);
         }
 
+        if ($request->filled('course')) {
+            $query->where('course', $request->course);
+        }
+
+        $courses = User::where('role', 'student')
+            ->whereNotNull('course')
+            ->where('course', '!=', '')
+            ->select('course')
+            ->distinct()
+            ->orderBy('course')
+            ->pluck('course')
+            ->values();
+
         $students = $query->orderBy('full_name')->paginate(10)->withQueryString();
 
-        return view('admin.students.index', compact('students'));
+        return view('admin.students.index', [
+            'students' => $students,
+            'courses' => $courses,
+            'courseOptions' => self::COURSE_OPTIONS,
+        ]);
     }
 
     public function store(Request $request)
@@ -41,7 +60,7 @@ class StudentController extends Controller
             'email'          => 'required|email|max:255|unique:users,email',
             'contact_number' => 'nullable|string|max:20',
             'id_number'      => 'required|string|max:50|unique:users,id_number',
-            'course'         => 'nullable|string|max:255',
+            'course'         => 'required|string|in:' . implode(',', self::COURSE_OPTIONS),
             'year_level'     => 'nullable|string|max:50',
             'password'       => 'required|string|min:6|confirmed',
             'profile_picture'=> 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
@@ -77,7 +96,7 @@ class StudentController extends Controller
             'email'          => 'required|email|max:255|unique:users,email,' . $student->id,
             'contact_number' => 'nullable|string|max:20',
             'id_number'      => 'required|string|max:50|unique:users,id_number,' . $student->id,
-            'course'         => 'nullable|string|max:255',
+            'course'         => 'required|string|in:' . implode(',', self::COURSE_OPTIONS),
             'year_level'     => 'nullable|string|max:50',
             'profile_picture'=> 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
         ]);
