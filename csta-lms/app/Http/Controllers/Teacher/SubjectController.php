@@ -55,7 +55,12 @@ class SubjectController extends Controller
 
         $subject->load(['schoolClass.students', 'resources.uploader', 'tasks.creator']);
 
-        return view('teacher.subjects.show', compact('subject'));
+        $streamType = $request->input('stream_type', 'all');
+        if (!in_array($streamType, ['all', 'resources', 'tasks'], true)) {
+            $streamType = 'all';
+        }
+
+        return view('teacher.subjects.show', compact('subject', 'streamType'));
     }
 
     public function store(Request $request)
