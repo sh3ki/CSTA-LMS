@@ -207,7 +207,7 @@
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Course Code</label>
+                            <label class="form-label">Subject Code</label>
                             <input type="text" name="course_code" class="form-control" placeholder="e.g. CS101" value="{{ old('course_code') }}">
                         </div>
                         <div class="col-md-6">
@@ -275,7 +275,7 @@
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Course Code</label>
+                            <label class="form-label">Subject Code</label>
                             <input type="text" name="course_code" id="edit_course_code" class="form-control">
                         </div>
                         <div class="col-md-6">
