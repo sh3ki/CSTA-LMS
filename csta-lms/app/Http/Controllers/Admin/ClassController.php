@@ -16,7 +16,17 @@ class ClassController extends Controller
 
         if ($request->filled('search')) {
             $q = $request->search;
-            $query->where('name', 'like', "%$q%");
+            $query->where(function ($qq) use ($q) {
+                $qq->where('name', 'like', "%$q%")
+                    ->orWhereHas('teacher', function ($teacherQuery) use ($q) {
+                        $teacherQuery->where('full_name', 'like', "%$q%")
+                            ->orWhere('id_number', 'like', "%$q%");
+                    })
+                    ->orWhereHas('students', function ($studentQuery) use ($q) {
+                        $studentQuery->where('full_name', 'like', "%$q%")
+                            ->orWhere('id_number', 'like', "%$q%");
+                    });
+            });
         }
 
         if ($request->filled('status') && $request->status !== '') {
