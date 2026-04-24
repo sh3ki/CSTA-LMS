@@ -2,6 +2,14 @@
 @section('title', $task->title)
 
 @section('content')
+@php
+    $taskStatus = \App\Models\Submission::statusFor($submission, $task);
+    $taskStatusColors = \App\Models\Submission::statusColors($taskStatus);
+    $googleFormUrl = null;
+    if (preg_match('/Google Form:\s*(https?:\/\/\S+)/i', (string) $task->description, $matches)) {
+        $googleFormUrl = $matches[1];
+    }
+@endphp
 <div class="page-header">
     <div>
         <h1 class="page-title">
@@ -35,13 +43,21 @@
 
                 <div class="mb-4">
                     <div style="font-size:14px;line-height:1.7;color:#3c4043;white-space:pre-line;">{{ $task->description ?: 'No description provided.' }}</div>
+                    @if($googleFormUrl)
+                        <div class="mt-3">
+                            <a href="{{ $googleFormUrl }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary rounded-pill px-3">
+                                <span class="material-icons align-middle me-1" style="font-size:16px;">open_in_new</span>
+                                Open Google Form
+                            </a>
+                        </div>
+                    @endif
                 </div>
 
                 <div class="row g-3">
                     <div class="col-md-4">
                         <div class="meta-box">
                             <div class="meta-label">Due Date</div>
-                            <div class="meta-value" style="color:{{ $task->due_date->isPast() ? '#ea4335' : '#34a853' }};">{{ $task->due_date->format('M d, Y h:i A') }}</div>
+                            <div class="meta-value" style="color:{{ $taskStatusColors['text'] }};">{{ $task->due_date->format('M d, Y h:i A') }}</div>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -54,13 +70,9 @@
                         <div class="meta-box">
                             <div class="meta-label">Status</div>
                             <div class="meta-value">
-                                @if($submission)
-                                    <span class="badge rounded-pill" style="background:#e6f4ea;color:#34a853;">Submitted</span>
-                                @elseif($task->due_date->isPast())
-                                    <span class="badge rounded-pill" style="background:#fce8e6;color:#ea4335;">Past Due</span>
-                                @else
-                                    <span class="badge rounded-pill" style="background:#fef7e0;color:#f9ab00;">Pending</span>
-                                @endif
+                                <span class="badge rounded-pill" style="background:{{ $taskStatusColors['background'] }};color:{{ $taskStatusColors['text'] }};">
+                                    {{ \App\Models\Submission::statusLabel($taskStatus) }}
+                                </span>
                             </div>
                         </div>
                     </div>
