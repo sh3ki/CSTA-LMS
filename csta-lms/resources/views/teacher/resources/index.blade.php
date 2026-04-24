@@ -223,7 +223,7 @@
                         <div class="col-12">
                             <label class="form-label">File <span class="text-danger">*</span></label>
                             <input type="file" name="file" class="form-control @error('file') is-invalid @enderror" required>
-                            <div class="form-text">Max file size: 20MB. Supported: PDF, DOCX, PPT, XLSX, images, etc.</div>
+                            <div class="form-text">Max file size: 500MB. Supported: PDF, DOCX, PPT, XLSX, images, etc.</div>
                             @error('file')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
                     </div>
