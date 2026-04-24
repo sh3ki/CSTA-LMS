@@ -45,7 +45,7 @@ class ResourceController extends Controller
             'title' => 'required|string|max:255',
             'resource_type' => 'required|in:Course Syllabus,Lesson,Others',
             'description' => 'nullable|string',
-            'file' => 'required|file|max:20480',
+            'file' => 'required|file|max:512000',
         ]);
 
         $file = $request->file('file');
@@ -73,7 +73,7 @@ class ResourceController extends Controller
             'title' => 'required|string|max:255',
             'resource_type' => 'required|in:Course Syllabus,Lesson,Others',
             'description' => 'nullable|string',
-            'file' => 'nullable|file|max:20480',
+            'file' => 'nullable|file|max:512000',
         ]);
 
         $data = [
