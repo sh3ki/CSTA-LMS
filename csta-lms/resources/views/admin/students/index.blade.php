@@ -37,11 +37,17 @@
                 <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>Active</option>
                 <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>Inactive</option>
             </select>
+            <select name="course" class="form-select" style="width:auto;font-size:14px;min-width:140px;">
+                <option value="">All Courses</option>
+                @foreach($courses as $course)
+                    <option value="{{ $course }}" {{ request('course') === $course ? 'selected' : '' }}>{{ $course }}</option>
+                @endforeach
+            </select>
             <button type="submit" class="btn btn-primary rounded-pill px-3">
                 <span class="material-icons align-middle" style="font-size:16px;">filter_list</span>
                 Filter
             </button>
-            @if(request()->hasAny(['search', 'status']))
+            @if(request()->hasAny(['search', 'status', 'course']))
                 <a href="{{ route('admin.students.index') }}" class="btn btn-light rounded-pill px-3">Reset</a>
             @endif
         </form>
@@ -184,8 +190,13 @@
                             <input type="email" name="email" class="form-control" value="{{ old('email') }}" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Course</label>
-                            <input type="text" name="course" class="form-control" value="{{ old('course') }}">
+                            <label class="form-label">Course <span class="text-danger">*</span></label>
+                            <select name="course" class="form-select" required>
+                                <option value="">Select Course</option>
+                                @foreach($courseOptions as $course)
+                                    <option value="{{ $course }}" {{ old('course') === $course ? 'selected' : '' }}>{{ $course }}</option>
+                                @endforeach
+                            </select>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Year Level</label>
@@ -247,8 +258,13 @@
                             <input type="email" name="email" id="edit_email" class="form-control" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Course</label>
-                            <input type="text" name="course" id="edit_course" class="form-control">
+                            <label class="form-label">Course <span class="text-danger">*</span></label>
+                            <select name="course" id="edit_course" class="form-select" required>
+                                <option value="">Select Course</option>
+                                @foreach($courseOptions as $course)
+                                    <option value="{{ $course }}">{{ $course }}</option>
+                                @endforeach
+                            </select>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Year Level</label>
