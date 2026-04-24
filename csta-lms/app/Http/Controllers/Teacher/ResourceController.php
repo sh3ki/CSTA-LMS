@@ -65,7 +65,7 @@ class ResourceController extends Controller
             'title'       => 'required|string|max:255',
             'resource_type' => 'required|in:Course Syllabus,Lesson,Others',
             'description' => 'nullable|string',
-            'file'        => 'required|file|max:20480', // 20MB max
+            'file'        => 'required|file|max:512000',
         ]);
 
         // Verify teacher owns this subject
@@ -110,7 +110,7 @@ class ResourceController extends Controller
             'subject_id'  => 'required|exists:subjects,id',
             'resource_type' => 'required|in:Course Syllabus,Lesson,Others',
             'description' => 'nullable|string',
-            'file'        => 'nullable|file|max:20480',
+            'file'        => 'nullable|file|max:512000',
         ]);
 
         if (!$this->ownsSubject($request->subject_id)) {
