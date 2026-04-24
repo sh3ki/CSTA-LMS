@@ -103,15 +103,39 @@
     $urgentTaskCount = 0;
     if (auth()->check()) {
         $studentId = auth()->id();
-        $urgentTaskCount = \App\Models\Task::whereHas('subject.schoolClass.students', function ($query) use ($studentId) {
-                $query->where('users.id', $studentId);
-            })
+        $classIds = \App\Models\SchoolClass::whereHas('students', function ($query) use ($studentId) {
+            $query->where('users.id', $studentId);
+        })->pluck('id');
+
+        $subjectIds = \App\Models\Subject::whereIn('class_id', $classIds)->pluck('id');
+
+        // Count tasks due within 24 hours where the student still has no completed submission timestamp.
+        $urgentTaskCount = \App\Models\Task::whereIn('subject_id', $subjectIds)
+            ->whereNotNull('due_date')
             ->where('due_date', '>', now())
             ->where('due_date', '<=', now()->copy()->addDay())
             ->whereDoesntHave('submissions', function ($submissionQuery) use ($studentId) {
-                $submissionQuery->where('student_id', $studentId);
+                $submissionQuery->where('student_id', $studentId)
+                    ->whereNotNull('submitted_at');
             })
             ->count();
+
+        // Fallback when currently on student tasks page: sync with the same red-dot visual condition.
+        if (isset($tasks) && isset($submissions)) {
+            $taskItems = $tasks instanceof \Illuminate\Pagination\AbstractPaginator
+                ? $tasks->getCollection()
+                : collect($tasks);
+
+            $pageUrgentCount = $taskItems->filter(function ($task) use ($submissions) {
+                $submission = $submissions->get($task->id);
+                return $task->due_date
+                    && $task->due_date->isFuture()
+                    && $task->due_date->lte(now()->copy()->addDay())
+                    && (!$submission || !$submission->submitted_at);
+            })->count();
+
+            $urgentTaskCount = max($urgentTaskCount, $pageUrgentCount);
+        }
     }
 @endphp
 
