@@ -65,6 +65,40 @@
     </div>
 </div>
 
+<!-- Monthly Submissions Chart -->
+<div class="card mb-4">
+    <div class="card-header"><span style="font-weight:600;">Monthly Submissions (Last 6 Months)</span></div>
+    <div class="card-body">
+        <canvas id="monthlyLine" style="max-height:250px;"></canvas>
+    </div>
+</div>
+
+<!-- Recent Submissions -->
+<div class="card mb-4">
+    <div class="card-header"><span style="font-weight:600;">Recent Submissions</span></div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0" style="font-size:13px;">
+            <thead><tr><th>Student</th><th>Task</th><th>Subject</th><th>Submitted</th><th>Grade</th></tr></thead>
+            <tbody>
+                @foreach($recentSubmissions as $sub)
+                <tr>
+                    <td>{{ $sub->student->full_name ?? '—' }}</td>
+                    <td>{{ $sub->task->title ?? '—' }}</td>
+                    <td>{{ $sub->task->subject->name ?? '—' }}</td>
+                    <td>{{ $sub->submitted_at->format('M d, Y H:i') }}</td>
+                    <td>
+                        @if($sub->grade !== null)
+                            {{ $sub->grade }}
+                        @else
+                            <span class="badge" style="background:#fef7e0;color:#9c5900;">Pending</span>
+                        @endif
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+</div>
 <div class="row g-4 mb-4">
     <!-- Top Classes -->
     <div class="col-md-6">
@@ -106,40 +140,6 @@
     </div>
 </div>
 
-<!-- Monthly Submissions Chart -->
-<div class="card mb-4">
-    <div class="card-header"><span style="font-weight:600;">Monthly Submissions (Last 6 Months)</span></div>
-    <div class="card-body">
-        <canvas id="monthlyLine" style="max-height:250px;"></canvas>
-    </div>
-</div>
-
-<!-- Recent Submissions -->
-<div class="card">
-    <div class="card-header"><span style="font-weight:600;">Recent Submissions</span></div>
-    <div class="card-body p-0">
-        <table class="table table-hover mb-0" style="font-size:13px;">
-            <thead><tr><th>Student</th><th>Task</th><th>Subject</th><th>Submitted</th><th>Grade</th></tr></thead>
-            <tbody>
-                @foreach($recentSubmissions as $sub)
-                <tr>
-                    <td>{{ $sub->student->full_name ?? '—' }}</td>
-                    <td>{{ $sub->task->title ?? '—' }}</td>
-                    <td>{{ $sub->task->subject->name ?? '—' }}</td>
-                    <td>{{ $sub->submitted_at->format('M d, Y H:i') }}</td>
-                    <td>
-                        @if($sub->grade !== null)
-                            {{ $sub->grade }}
-                        @else
-                            <span class="badge" style="background:#fef7e0;color:#9c5900;">Pending</span>
-                        @endif
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-</div>
 @endsection
 
 @push('scripts')
