@@ -180,6 +180,12 @@
                                         <div style="font-size:12px;color:#5f6368;">{{ optional($attempt->submitted_at)->format('M d, Y h:i A') }}</div>
                                     </div>
                                     <div style="font-size:13px;color:#3c4043;">{{ $attempt->file_name }}</div>
+                                    @if($attempt->file_path)
+                                        <a href="{{ route('student.submission-histories.download', $attempt->id) }}" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                                            <span class="material-icons align-middle me-1" style="font-size:14px;">download</span>
+                                            Download
+                                        </a>
+                                    @endif
                                 </div>
                                 @if($attempt->submission_note)
                                     <div style="margin-top:8px;font-size:13px;color:#5f6368;white-space:pre-line;">{{ $attempt->submission_note }}</div>
