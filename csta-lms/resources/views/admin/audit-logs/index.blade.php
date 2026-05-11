@@ -10,6 +10,51 @@
         </h1>
         <p class="page-subtitle">Track all system activity and user actions.</p>
     </div>
+    <a href="{{ route('admin.audit-logs.export', request()->query()) }}" class="btn btn-outline-secondary rounded-pill px-4 d-flex align-items-center gap-2">
+        <span class="material-icons" style="font-size:18px;">download</span>
+        Export CSV
+    </a>
+</div>
+
+@include('partials._toasts')
+
+<!-- Filters -->
+<div class="card mb-4">
+    <div class="card-body p-3">
+        <form method="GET" class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <input type="text" name="search" class="form-control form-control-sm" placeholder="Search user, action…" value="{{ request('search') }}">
+            </div>
+            <div class="col-md-2">
+                <select name="role" class="form-select form-select-sm">
+                    <option value="">All Roles</option>
+                    <option value="admin" @selected(request('role') === 'admin')>Admin</option>
+                    <option value="teacher" @selected(request('role') === 'teacher')>Teacher</option>
+                    <option value="student" @selected(request('role') === 'student')>Student</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="action" class="form-select form-select-sm">
+                    <option value="">All Actions</option>
+                    @foreach($distinctActions as $action)
+                    <option value="{{ $action }}" @selected(request('action') === $action)>{{ $action }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-2">
+                <input type="date" name="date_from" class="form-control form-control-sm" value="{{ request('date_from') }}" placeholder="From">
+            </div>
+            <div class="col-md-2">
+                <input type="date" name="date_to" class="form-control form-control-sm" value="{{ request('date_to') }}" placeholder="To">
+            </div>
+            <div class="col-md-1 d-flex gap-1">
+                <button class="btn btn-sm btn-primary w-100" style="background:#800020;border-color:#800020;">Go</button>
+                @if(request()->hasAny(['search','role','action','date_from','date_to']))
+                    <a href="{{ route('admin.audit-logs.index') }}" class="btn btn-sm btn-outline-secondary">✕</a>
+                @endif
+            </div>
+        </form>
+    </div>
 </div>
 
 @if($logs->isEmpty())
