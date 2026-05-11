@@ -504,10 +504,17 @@
     <div class="nav-spacer"></div>
 
     <div class="nav-actions">
-        <button class="nav-icon-btn" title="Notifications">
+        <button class="nav-icon-btn" title="Notifications" id="notifBell" data-bs-toggle="dropdown" aria-expanded="false" style="position:relative;">
             <span class="material-icons">notifications</span>
-            <span class="notif-badge"></span>
+            <span class="notif-badge" id="notifCount" style="display:none;"></span>
         </button>
+        <div class="dropdown-menu dropdown-menu-end p-0" id="notifDropdown" style="width:360px;max-height:480px;overflow-y:auto;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.15);">
+            <div class="d-flex align-items-center justify-content-between p-3 border-bottom">
+                <span style="font-weight:600;font-size:14px;">Notifications</span>
+                <button onclick="markAllRead()" class="btn btn-sm btn-link p-0" style="font-size:12px;color:#1a73e8;text-decoration:none;">Mark all read</button>
+            </div>
+            <div id="notifList"><div class="p-4 text-center text-muted" style="font-size:13px;">Loading…</div></div>
+        </div>
 
         <div class="dropdown">
             <button class="profile-btn dropdown-toggle" data-bs-toggle="dropdown" style="border:none;">
@@ -559,6 +566,18 @@
        class="sidebar-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
         <span class="material-icons">dashboard</span>
         Dashboard
+    </a>
+    
+
+    <a href="{{ route('admin.analytics.index') }}"
+       class="sidebar-link {{ request()->routeIs('admin.analytics*') ? 'active' : '' }}">
+        <span class="material-icons">insights</span>
+        Analytics
+    </a>
+    <a href="{{ route('admin.reports.index') }}"
+       class="sidebar-link {{ request()->routeIs('admin.reports*') ? 'active' : '' }}">
+        <span class="material-icons">bar_chart</span>
+        Reports
     </a>
 
     <div class="sidebar-divider"></div>
@@ -612,11 +631,6 @@
     <div class="sidebar-divider"></div>
     <div class="sidebar-section-label">System</div>
 
-    <a href="{{ route('admin.reports.index') }}"
-       class="sidebar-link {{ request()->routeIs('admin.reports*') ? 'active' : '' }}">
-        <span class="material-icons">bar_chart</span>
-        Reports
-    </a>
 
     <a href="{{ route('admin.audit-logs.index') }}"
        class="sidebar-link {{ request()->routeIs('admin.audit-logs*') ? 'active' : '' }}">
@@ -691,5 +705,62 @@
 </script>
 @include('partials._toasts')
 @stack('scripts')
+<script>
+// ─── Notification Bell ────────────────────────────────────────────────────────
+const CSRF = document.querySelector('meta[name="csrf-token"]')?.content;
+
+async function loadNotifications() {
+    try {
+        const res = await fetch('{{ route("notifications.recent") }}');
+        const data = await res.json();
+        const list = document.getElementById('notifList');
+        const badge = document.getElementById('notifCount');
+
+        if (data.unread > 0) {
+            badge.textContent = data.unread > 9 ? '9+' : data.unread;
+            badge.style.display = 'flex';
+        } else {
+            badge.style.display = 'none';
+        }
+
+        if (!data.notifications.length) {
+            list.innerHTML = '<div class="p-4 text-center text-muted" style="font-size:13px;">No notifications.</div>';
+            return;
+        }
+
+        list.innerHTML = data.notifications.map(n => `
+            <div class="d-flex align-items-start gap-2 p-3 border-bottom ${n.read_at ? '' : 'bg-light'}" style="cursor:pointer;" onclick="handleNotifClick(${n.id}, '${n.url}')">
+                <div style="width:36px;height:36px;background:#f1f3f4;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <span class="material-icons" style="font-size:18px;color:#5f6368;">${n.icon || 'notifications'}</span>
+                </div>
+                <div style="flex:1;min-width:0;">
+                    <div style="font-size:13px;font-weight:${n.read_at ? '400' : '600'};color:#202124;">${n.title}</div>
+                    <div style="font-size:12px;color:#5f6368;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${n.message}</div>
+                    <div style="font-size:11px;color:#9aa0a6;">${n.time}</div>
+                </div>
+                ${!n.read_at ? `<button onclick="event.stopPropagation();markRead(${n.id})" style="background:none;border:none;padding:2px;color:#9aa0a6;" title="Mark read"><span class="material-icons" style="font-size:16px;">check</span></button>` : ''}
+            </div>`).join('');
+    } catch(e) { console.error('Notification error', e); }
+}
+
+async function handleNotifClick(id, url) {
+    await markRead(id);
+    if (url && url !== 'null') window.location.href = url;
+}
+
+async function markRead(id) {
+    await fetch(`/notifications/${id}/read`, { method: 'PATCH', headers: { 'X-CSRF-TOKEN': CSRF } });
+    loadNotifications();
+}
+
+async function markAllRead() {
+    await fetch('/notifications/read-all', { method: 'PATCH', headers: { 'X-CSRF-TOKEN': CSRF } });
+    loadNotifications();
+}
+
+document.getElementById('notifBell')?.addEventListener('click', loadNotifications);
+loadNotifications();
+setInterval(loadNotifications, 60000);
+</script>
 </body>
 </html>
