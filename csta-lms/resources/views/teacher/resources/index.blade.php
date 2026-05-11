@@ -41,6 +41,12 @@
                     </option>
                 @endforeach
             </select>
+            <select name="resource_type" class="form-select" style="width:auto;font-size:14px;min-width:160px;">
+                <option value="">All Types</option>
+                @foreach(['Course Syllabus','Lesson','Others'] as $type)
+                    <option value="{{ $type }}" {{ request('resource_type') == $type ? 'selected' : '' }}>{{ $type }}</option>
+                @endforeach
+            </select>
             <button type="submit" class="btn btn-primary rounded-pill px-3">
                 <span class="material-icons align-middle" style="font-size:16px;">filter_list</span>
                 Filter
