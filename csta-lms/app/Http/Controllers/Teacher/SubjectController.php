@@ -98,4 +98,55 @@ class SubjectController extends Controller
             ->with('created_subject_code', $subject->subject_code)
             ->with('created_subject_name', $subject->name);
     }
+
+    public function update(Request $request, Subject $subject)
+    {
+        $teacher = $request->user();
+
+        $ownsSubject = SchoolClass::where('teacher_id', $teacher->id)
+            ->where('id', $subject->class_id)
+            ->exists();
+
+        if (!$ownsSubject) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        $request->validate([
+            'name'        => 'required|string|max:255',
+            'course_code' => 'nullable|string|max:100',
+            'semester'    => 'required|in:1st,2nd,3rd',
+            'description' => 'nullable|string',
+        ]);
+
+        $subject->update([
+            'name'        => $request->name,
+            'course_code' => $request->course_code,
+            'semester'    => $request->semester,
+            'description' => $request->description,
+        ]);
+
+        AuditLog::record('Update Subject', "Teacher updated subject: {$subject->name}");
+
+        return back()->with('success', 'Subject updated successfully.');
+    }
+
+    public function destroy(Request $request, Subject $subject)
+    {
+        $teacher = $request->user();
+
+        $ownsSubject = SchoolClass::where('teacher_id', $teacher->id)
+            ->where('id', $subject->class_id)
+            ->exists();
+
+        if (!$ownsSubject) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        $name = $subject->name;
+        $subject->delete();
+
+        AuditLog::record('Delete Subject', "Teacher deleted subject: {$name}");
+
+        return back()->with('success', 'Subject deleted.');
+    }
 }
