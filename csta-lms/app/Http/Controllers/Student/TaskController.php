@@ -208,4 +208,20 @@ class TaskController extends Controller
 
         return response()->download(Storage::disk('public')->path($task->file_path), $task->file_name);
     }
+
+    public function downloadSubmissionHistory(SubmissionHistory $history)
+    {
+        $student = auth()->user();
+
+        // Verify the history belongs to this student via the submission
+        $submission = Submission::where('id', $history->submission_id)
+            ->where('student_id', $student->id)
+            ->firstOrFail();
+
+        if (!$history->file_path || !Storage::disk('public')->exists($history->file_path)) {
+            abort(404, 'File not found.');
+        }
+
+        return Storage::disk('public')->download($history->file_path, $history->file_name ?? basename($history->file_path));
+    }
 }
