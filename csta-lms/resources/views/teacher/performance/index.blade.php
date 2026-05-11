@@ -12,6 +12,10 @@
         </h1>
         <p class="page-subtitle">View student grades and performance across your classes.</p>
     </div>
+    <a href="{{ route('teacher.performance.export', request()->query()) }}" class="btn btn-primary rounded-pill px-4">
+        <span class="material-icons align-middle me-1" style="font-size:16px;">download</span>
+        Export CSV
+    </a>
 </div>
 
 <!-- Filter Bar -->
