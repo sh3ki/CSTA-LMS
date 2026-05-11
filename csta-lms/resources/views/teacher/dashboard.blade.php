@@ -156,7 +156,7 @@
                     <tr>
                         <td>
                             <div class="d-flex align-items-center gap-2">
-                                <div style="width:32px;height:32px;background:linear-gradient(135deg,{{ $task->due_date->isPast() ? '#ea4335,#f28b82' : '#4a6cf7,#8fa8ff' }});border-radius:8px;display:flex;align-items:center;justify-content:center;">
+                                <div style="width:32px;height:32px;background:linear-gradient(135deg,{{ $task->due_date?->isPast() ? '#ea4335,#f28b82' : '#4a6cf7,#8fa8ff' }});border-radius:8px;display:flex;align-items:center;justify-content:center;">
                                     <span class="material-icons" style="color:#fff;font-size:16px;">assignment</span>
                                 </div>
                                 <span style="font-weight:500;font-size:14px;">{{ $task->title }}</span>
@@ -167,11 +167,11 @@
                                 {{ $task->subject->name }}
                             </span>
                         </td>
-                        <td style="font-size:13px;color:{{ $task->due_date->isPast() ? '#ea4335' : '#5f6368' }};">
-                            {{ $task->due_date->format('M d, Y h:i A') }}
+                        <td style="font-size:13px;color:{{ $task->due_date?->isPast() ? '#ea4335' : '#5f6368' }};">
+                            {{ $task->due_date?->format('M d, Y h:i A') ?? 'No due date' }}
                         </td>
                         <td>
-                            @if($task->due_date->isPast())
+                            @if($task->due_date?->isPast())
                                 <span class="badge rounded-pill" style="background:#fce8e6;color:#ea4335;font-size:12px;">Past Due</span>
                             @else
                                 <span class="badge rounded-pill" style="background:#e6f4ea;color:#34a853;font-size:12px;">Active</span>
