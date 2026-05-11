@@ -84,7 +84,7 @@ class ProfileController extends Controller
             return back()->with('error', 'Current password is incorrect.');
         }
 
-        $user->update(['password' => $request->password]);
+        $user->update(['password' => Hash::make($request->password)]);
 
         AuditLog::record('password_change', 'Changed account password.');
 
