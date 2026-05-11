@@ -119,11 +119,30 @@
                     </div>
                     <!-- Card Footer -->
                     <div style="padding:0 20px 16px;">
-                        <div class="d-flex align-items-center gap-2">
-                            <div style="width:28px;height:28px;background:linear-gradient(135deg,{{ $color[0] }},{{ $color[1] }});border-radius:50%;display:flex;align-items:center;justify-content:center;">
-                                <span class="material-icons" style="color:#fff;font-size:14px;">person</span>
+                        <div class="d-flex align-items-center justify-content-between gap-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <div style="width:28px;height:28px;background:linear-gradient(135deg,{{ $color[0] }},{{ $color[1] }});border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                                    <span class="material-icons" style="color:#fff;font-size:14px;">person</span>
+                                </div>
+                                <span style="font-size:12px;color:#80868b;">{{ auth()->user()->full_name }}</span>
                             </div>
-                            <span style="font-size:12px;color:#80868b;">{{ auth()->user()->full_name }}</span>
+                            <div class="d-flex gap-1" onclick="event.preventDefault();event.stopPropagation();">
+                                <button class="btn btn-sm btn-outline-secondary rounded-pill px-2 py-0 edit-subject-btn"
+                                    data-id="{{ $subject->id }}"
+                                    data-name="{{ $subject->name }}"
+                                    data-course_code="{{ $subject->course_code }}"
+                                    data-semester="{{ $subject->semester }}"
+                                    data-description="{{ $subject->description }}"
+                                    title="Edit">
+                                    <span class="material-icons" style="font-size:14px;">edit</span>
+                                </button>
+                                <form method="POST" action="{{ route('teacher.subjects.destroy', $subject) }}" onsubmit="return confirm('Delete this subject?');">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-2 py-0" title="Delete">
+                                        <span class="material-icons" style="font-size:14px;">delete</span>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -150,6 +169,50 @@
         {{ $subjects->links('pagination::bootstrap-5') }}
     </div>
 @endif
+
+<!-- Edit Subject Modal -->
+<div class="modal fade" id="editSubjectModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius:16px;border:none;box-shadow:0 8px 32px rgba(0,0,0,.15);">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Subject</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editSubjectForm" method="POST">
+                @csrf @method('PUT')
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Subject Name <span class="text-danger">*</span></label>
+                            <input type="text" name="name" id="editSubjectName" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Course Code</label>
+                            <input type="text" name="course_code" id="editSubjectCourseCode" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Semester</label>
+                            <select name="semester" id="editSubjectSemester" class="form-select">
+                                <option value="">N/A</option>
+                                <option value="1st">1st</option>
+                                <option value="2nd">2nd</option>
+                                <option value="Summer">Summer</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Description</label>
+                            <textarea name="description" id="editSubjectDescription" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 <div class="modal fade" id="addSubjectModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
@@ -274,6 +337,20 @@
     @if(session('created_subject_code'))
         new bootstrap.Modal(document.getElementById('subjectCodeModal')).show();
     @endif
+
+    // Edit subject modal wiring
+    document.querySelectorAll('.edit-subject-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.dataset.id;
+            document.getElementById('editSubjectForm').action = `/teacher/subjects/${id}`;
+            document.getElementById('editSubjectName').value = btn.dataset.name || '';
+            document.getElementById('editSubjectCourseCode').value = btn.dataset.course_code || '';
+            document.getElementById('editSubjectDescription').value = btn.dataset.description || '';
+            const sem = document.getElementById('editSubjectSemester');
+            sem.value = btn.dataset.semester || '';
+            new bootstrap.Modal(document.getElementById('editSubjectModal')).show();
+        });
+    });
 })();
 </script>
 @endpush
