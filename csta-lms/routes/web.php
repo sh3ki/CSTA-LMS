@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
 use App\Http\Controllers\Admin\TeacherController;
 use App\Http\Controllers\Admin\StudentController;
@@ -13,16 +14,20 @@ use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\TaskController as AdminTaskController;
 use App\Http\Controllers\Admin\ResourceController as AdminResourceController;
+use App\Http\Controllers\Admin\AnalyticsController as AdminAnalyticsController;
 use App\Http\Controllers\Teacher\DashboardController as TeacherDashboard;
 use App\Http\Controllers\Teacher\ClassController as TeacherClassController;
 use App\Http\Controllers\Teacher\SubjectController as TeacherSubjectController;
 use App\Http\Controllers\Teacher\ResourceController as TeacherResourceController;
 use App\Http\Controllers\Teacher\TaskController as TeacherTaskController;
 use App\Http\Controllers\Teacher\PerformanceController as TeacherPerformanceController;
+use App\Http\Controllers\Teacher\AnnouncementController as TeacherAnnouncementController;
+use App\Http\Controllers\Teacher\AnalyticsController as TeacherAnalyticsController;
 use App\Http\Controllers\Student\DashboardController as StudentDashboard;
 use App\Http\Controllers\Student\SubjectController as StudentSubjectController;
 use App\Http\Controllers\Student\TaskController as StudentTaskController;
 use App\Http\Controllers\Student\AnnouncementController as StudentAnnouncementController;
+use App\Http\Controllers\Student\AnalyticsController as StudentAnalyticsController;
 use Illuminate\Support\Facades\Route;
 
 // ─── Landing Page ────────────────────────────────────────────────────────────
@@ -42,6 +47,12 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile/photo',            [ProfileController::class, 'updatePhoto'])->name('profile.updatePhoto');
     Route::delete('/profile/photo',           [ProfileController::class, 'removePhoto'])->name('profile.removePhoto');
     Route::patch('/profile/password',         [ProfileController::class, 'changePassword'])->name('profile.changePassword');
+
+    // Notifications (all roles)
+    Route::get('/notifications/recent',                [NotificationController::class, 'recent'])->name('notifications.recent');
+    Route::get('/notifications/unread-count',          [NotificationController::class, 'unreadCount'])->name('notifications.unreadCount');
+    Route::patch('/notifications/{id}/read',           [NotificationController::class, 'markRead'])->name('notifications.read');
+    Route::patch('/notifications/read-all',            [NotificationController::class, 'markAllRead'])->name('notifications.readAll');
 });
 
 // ─── Admin Routes ─────────────────────────────────────────────────────────────
@@ -101,15 +112,27 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 
     // Announcements
     Route::get('/announcements',                   [AnnouncementController::class, 'index'])->name('announcements.index');
+    Route::post('/announcements',                  [AnnouncementController::class, 'store'])->name('announcements.store');
+    Route::put('/announcements/{announcement}',    [AnnouncementController::class, 'update'])->name('announcements.update');
+    Route::patch('/announcements/{announcement}/publish', [AnnouncementController::class, 'publish'])->name('announcements.publish');
+    Route::delete('/announcements/{announcement}', [AnnouncementController::class, 'destroy'])->name('announcements.destroy');
 
     // Reports
     Route::get('/reports',                         [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/export',                  [ReportController::class, 'export'])->name('reports.export');
 
     // Audit Logs
     Route::get('/audit-logs',                      [AuditLogController::class, 'index'])->name('audit-logs.index');
+    Route::get('/audit-logs/export',               [AuditLogController::class, 'export'])->name('audit-logs.export');
 
     // Settings
     Route::get('/settings',                        [SettingsController::class, 'index'])->name('settings.index');
+    Route::post('/settings',                       [SettingsController::class, 'update'])->name('settings.update');
+
+    // Analytics
+    Route::get('/analytics',                       [AdminAnalyticsController::class, 'index'])->name('analytics.index');
+    Route::get('/analytics/student/{student}',     [AdminAnalyticsController::class, 'student'])->name('analytics.student');
+    Route::get('/analytics/teacher/{teacher}',     [AdminAnalyticsController::class, 'teacher'])->name('analytics.teacher');
 });
 
 // ─── Teacher Routes ────────────────────────────────────────────────────────────
@@ -127,6 +150,8 @@ Route::prefix('teacher')->name('teacher.')->middleware(['auth', 'role:teacher'])
     Route::get('/subjects',              [TeacherSubjectController::class, 'index'])->name('subjects.index');
     Route::post('/subjects',             [TeacherSubjectController::class, 'store'])->name('subjects.store');
     Route::get('/subjects/{subject}',    [TeacherSubjectController::class, 'show'])->name('subjects.show');
+    Route::put('/subjects/{subject}',    [TeacherSubjectController::class, 'update'])->name('subjects.update');
+    Route::delete('/subjects/{subject}', [TeacherSubjectController::class, 'destroy'])->name('subjects.destroy');
 
     // Resources Management
     Route::get('/resources',              [TeacherResourceController::class, 'index'])->name('resources.index');
@@ -149,6 +174,17 @@ Route::prefix('teacher')->name('teacher.')->middleware(['auth', 'role:teacher'])
 
     // Performance Report
     Route::get('/performance',            [TeacherPerformanceController::class, 'index'])->name('performance.index');
+    Route::get('/performance/export',     [TeacherPerformanceController::class, 'export'])->name('performance.export');
+
+    // Announcements (Teacher)
+    Route::get('/announcements',                   [TeacherAnnouncementController::class, 'index'])->name('announcements.index');
+    Route::post('/announcements',                  [TeacherAnnouncementController::class, 'store'])->name('announcements.store');
+    Route::put('/announcements/{announcement}',    [TeacherAnnouncementController::class, 'update'])->name('announcements.update');
+    Route::delete('/announcements/{announcement}', [TeacherAnnouncementController::class, 'destroy'])->name('announcements.destroy');
+
+    // Analytics (Teacher)
+    Route::get('/analytics',                          [TeacherAnalyticsController::class, 'index'])->name('analytics.index');
+    Route::get('/analytics/student/{student}',        [TeacherAnalyticsController::class, 'student'])->name('analytics.student');
 });
 
 // ─── Student Routes ────────────────────────────────────────────────────────────
@@ -166,4 +202,10 @@ Route::prefix('student')->name('student.')->middleware(['auth', 'role:student'])
     Route::get('/resources/{resource}/download', [StudentSubjectController::class, 'downloadResource'])->name('resources.download');
 
     Route::get('/announcements', [StudentAnnouncementController::class, 'index'])->name('announcements.index');
+
+    // Analytics (Student)
+    Route::get('/analytics', [StudentAnalyticsController::class, 'index'])->name('analytics.index');
+
+    // Submission history download
+    Route::get('/submission-histories/{history}/download', [StudentTaskController::class, 'downloadSubmissionHistory'])->name('submission-histories.download');
 });
