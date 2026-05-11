@@ -52,6 +52,10 @@ class ResourceController extends Controller
             $query->where('subject_id', $request->subject_id);
         }
 
+        if ($request->filled('resource_type')) {
+            $query->where('resource_type', $request->resource_type);
+        }
+
         $resources = $query->orderByDesc('created_at')->paginate(10)->withQueryString();
         $subjects  = Subject::where('status', true)->whereIn('class_id', $classIds)->orderBy('name')->get();
 
