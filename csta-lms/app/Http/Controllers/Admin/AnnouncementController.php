@@ -51,7 +51,7 @@ class AnnouncementController extends Controller
             'title'       => $request->title,
             'body'        => $request->body,
             'target_role' => $request->target_role,
-            'created_by'  => auth()->id(),
+            'created_by'  => auth()->user()->id,
             'published_at' => $request->publish_now ? now() : null,
         ]);
 
