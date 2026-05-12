@@ -47,7 +47,7 @@ class AnnouncementController extends Controller
             'title'        => $request->title,
             'body'         => $request->body,
             'target_role'  => 'student',
-            'created_by'   => auth()->id(),
+            'created_by'   => auth()->user()->id,
             'published_at' => now(),
         ]);
 
@@ -92,7 +92,7 @@ class AnnouncementController extends Controller
 
     private function authorizeOwner(Announcement $announcement): void
     {
-        if ($announcement->created_by !== auth()->id()) {
+        if ($announcement->created_by !== auth()->user()->id) {
             abort(403);
         }
     }
