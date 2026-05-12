@@ -55,7 +55,7 @@
                     <span class="material-icons align-middle me-1" style="font-size:14px;">schedule</span>{{ $ann->created_at->diffForHumans() }}
                 </div>
             </div>
-            @if($ann->created_by === auth()->id())
+            @if($ann->created_by === auth()->user()->id)
             <div class="d-flex gap-1 ms-3">
                 <button class="btn btn-sm" style="background:#e8f0fe;color:#1a73e8;border:none;" data-bs-toggle="modal" data-bs-target="#editModal{{ $ann->id }}" title="Edit">
                     <span class="material-icons" style="font-size:16px;">edit</span>
@@ -73,7 +73,7 @@
 </div>
 
 <!-- Edit Modal -->
-@if($ann->created_by === auth()->id())
+@if($ann->created_by === auth()->user()->id)
 <div class="modal fade" id="editModal{{ $ann->id }}" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
